@@ -3,6 +3,7 @@
  * Picks a single game (randomly).
  * @kwekukankam - chancebot 2021
  */
+var PlaceBetOneXTwo = require("./placebetonextwo");
 GamePicker = {}
 
 /*
@@ -12,42 +13,45 @@ GamePicker = {}
  */
 GamePicker.pickGame = async (page) => {
 
-    const navigationPromise = page.waitForNavigation();
-    await navigationPromise;
-
-    //get total live leagues available
-    await page.waitForSelector('.m-overview > .match > .m-table')
-    const data = await page.evaluate(() => {
-        const wrapper = Array.from(document.querySelectorAll('.m-overview > .match > .m-table'))
-        return wrapper.length;
-    });
-
-    //loop through each live league
-    for (let i = 0; i < data; i++) {
-        //get count of games available for a picked league
-        const gameCount = await page.evaluate((val) => {
-            const wrapper = Array.from(document.querySelectorAll(`.m-overview > .match > .m-table:nth-child(${val}) > .m-table-row`))
+    try {
+        const navigationPromise = page.waitForNavigation();
+        await navigationPromise;
+    
+        //get total live leagues available
+        await page.waitForSelector('.m-overview > .match > .m-table')
+        const data = await page.evaluate(() => {
+            const wrapper = Array.from(document.querySelectorAll('.m-overview > .match > .m-table'))
             return wrapper.length;
-        }, i);
+        });
+    
+        //loop through each live league
+        mainLoop:
+        for (let i = 0; i < data; i++) {
+            //get count of games available for a picked league
+            const gameCount = await page.evaluate((val) => {
+                const wrapper = Array.from(document.querySelectorAll(`.m-overview > .match > .m-table:nth-child(${val}) > .m-table-row`))
+                return wrapper.length;
+            }, i);
+    
+            for (let j = 1; j <= gameCount; j++) {
+                const currentTime = await timerCheck(i, page);
+                const gameOdd = await pickMarket(i,j,page);
+                console.log(gameOdd);
+                const isBet = await lowOddHighStake(page,gameOdd,i,j);
+                // if(isBet[0] == 0 /*true*/){
+                //     PlaceBetOneXTwo.live(page,1 /*bet amount*/,isBet[1]/*odds value*/,i,j,isBet[2]); 
+                //     break mainLoop;
+                // }else{
 
-        for (let j = 1; j <= gameCount; j++) {
-            const currentTime = await timerCheck(i, page);
-            await pickMarket(i,j,page);
-            //we check if current time is greater than a time value
-            if (currentTime > 60) {
-               // console.log(`Game time reached  - ${currentTime} minutes`)
-                // continue
-                // await page.waitForSelector(`.m-overview > .match > .m-table:nth-child(${currentLeaguePick}) > .m-table-row:nth-child(${leagueGamePick}) > .market-size`)
-                // await page.click(`.m-overview > .match > .m-table:nth-child(${currentLeaguePick}) > .m-table-row:nth-child(${leagueGamePick}) > .market-size`)
+                // }
 
-            } else {
-              //  console.log(`Game time not reached  - ${currentTime} minutes`)
             }
+    
         }
-
-
+    } catch (error) {
+        console.log(`Navigation error`);
+        console.log(error);
     }
-
 }
 
 
@@ -106,7 +110,25 @@ async function pickMarket(currentleague,currentgame, page) {
     const drawOdd  =  await singleOdd(page,currentleague,currentgame,2)
     const awayOdd  =  await singleOdd(page,currentleague,currentgame,3)
     oddArr = [homeOdd,drawOdd,awayOdd]
-    console.log(oddArr);
+    return oddArr;
+}
+
+//Strategies
+async function lowOddHighStake(page,oddArr,currentleague,currentgame){
+    // lets check the scores too 
+    await goalChecker(page,currentleague)
+    //find minimum value in addArr
+    const min = Math.min(...oddArr).toFixed(2)
+    let minPosition =  oddArr.indexOf(min.toString())
+    if (min > 1.06 && min < 4.10) {
+        console.log("Found Correct Range value " + min)
+        const res = [0,min,minPosition+1]
+        return res; 
+    }else {
+        const res = [1];
+        return res;
+    }
+
 }
 
 async function singleOdd(page,currentleague,currentgame,outcomechild){
@@ -127,7 +149,18 @@ async function singleOdd(page,currentleague,currentgame,outcomechild){
     }, currentleague, currentgame, outcomechild); 
 }
 
-module.exports = GamePicker
+async function goalChecker(page,currentLeaguePick){
+    const homeScore = await page.$eval(`.m-table:nth-child(${currentLeaguePick}) > .m-table-row > .m-table-cell > .left-team-table > .score > .score-item:nth-child(1)`, el => el.innerHTML);
+    const awayScore = await page.$eval(`.m-table:nth-child(${currentLeaguePick}) > .m-table-row > .m-table-cell > .left-team-table > .score > .score-item:nth-child(2)`, el => el.innerHTML);
+    let goalDiff = parseInt(homeScore.trim()) - parseInt(awayScore.trim())
+    if(goalDiff < 0){
+        goalDiff = goalDiff * -1;
+        
+    }
+    console.log("Diff " + goalDiff)
+}
+
+module.exports = GamePicker 
 
 
     // //get random number from range of live leagues

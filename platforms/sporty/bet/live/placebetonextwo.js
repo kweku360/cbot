@@ -1,16 +1,16 @@
 /*
- * PlaceBet
- * Places bet on provided market and odds (with validations)
+ * PlaceBetOneXTwo
+ * Places bet on 1 x 2 markets and odds (with validations)
  * @kwekukankam - chancebot 2021
  */
 var accountResource = require("../../account/accountmanager");
 var logArchitect = require("../../log/architect");
-PlaceBet = {}
+PlaceBetOneXTwo = {}
 
-PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) => {
+PlaceBetOneXTwo.live = async (page, betAmt,currentOdd,currentleague,currentgame,outcomechild) => {
     try {
         // clear bet slip
-        PlaceBet.clearBetSlip(page);
+        PlaceBetOneXTwo.clearBetSlip(page);
 
         //check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
@@ -20,10 +20,9 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
             logArchitect.addItem({ "Bet Status": `insuffiecient funds to make bet -  ${accBal} Ghs` })
             return;
         }
-
-        //click on item
-        await page.waitForSelector(`.m-table__wrapper:nth-child(${marketCountItem}) > .m-table > .m-table-row > .m-table-cell:nth-child(${outcomeValue}) > .m-table-cell-item:nth-child(2)`)
-        await page.click(`.m-table__wrapper:nth-child(${marketCountItem}) > .m-table > .m-table-row > .m-table-cell:nth-child(${outcomeValue}) > .m-table-cell-item:nth-child(2)`)
+        //click on item (change this)
+        await page.waitForSelector(`.m-table:nth-child(${currentleague}) > .m-table-row:nth-child(${currentgame})> .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
+        await page.click(`.m-table:nth-child(${currentleague}) > .m-table-row:nth-child(${currentgame})> .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
 
         // change value
         await page.waitForSelector('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input')
@@ -31,7 +30,7 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
         await input.click({ clickCount: 3 })
         await page.type('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input', `${betAmt}`)
 
-        if(placeBet.validateBetOdd(page,currentOdd)){
+        if(PlaceBetOneXTwo.validateBetOdd(page,currentOdd)){
                     //click on place bet
         const acceptBet = await page.evaluate(() => {
             const wrapper = document.querySelector(`.m-betslips > .m-stake > div > .m-btn-wrapper > .af-button > span`)
@@ -48,7 +47,7 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
         await page.waitForSelector('.m-stake > div > .m-btn-wrapper > .af-button > span')
         await page.click('.m-stake > div > .m-btn-wrapper > .af-button > span')
         
-        if(placeBet.validateBetOdd(page,currentOdd)){
+        if(PlaceBetOneXTwo.validateBetOdd(page,currentOdd)){
         // click on final bet
         await page.waitForSelector('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
         await page.click('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
@@ -67,15 +66,13 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
             logArchitect.addItem({ "Bet Status": `No Bet Placed - Non Matching Odds` })
         }
 
-
-
     } catch (error) {
         console.log(error);
         console.log("Unable to Place Bet Now")
     }
 }
 
-PlaceBet.validateBetOdd = async (page,currentOdd) => {
+PlaceBetOneXTwo.validateBetOdd = async (page,currentOdd) => {
 
     const getOdd = await page.evaluate(() => {
         const wrapper = document.querySelector(`.m-lay-mid > .m-lay-mid > .m-item-main > .m-item-odds > .m-text-main`)
@@ -89,7 +86,7 @@ PlaceBet.validateBetOdd = async (page,currentOdd) => {
 }
 
 //Clear betslip befor placing a new one.
-PlaceBet.clearBetSlip = async (page) => {
+PlaceBetOneXTwo.clearBetSlip = async (page) => {
     await page.waitForSelector('.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count')
     const betslip = await page.evaluate(() => {
         const wrapper = document.querySelector(`.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count`)
@@ -108,5 +105,5 @@ PlaceBet.clearBetSlip = async (page) => {
 }
  
 
-module.exports = PlaceBet;
+module.exports = PlaceBetOneXTwo;
 
