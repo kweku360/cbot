@@ -1,3 +1,4 @@
+var StdResponse = require("../../../../managers/log/stdresponse");
 ReverseBetShore = {};
 
 ReverseBetShore.run = (req) =>{
@@ -18,7 +19,7 @@ let lossPercent = parseFloat(req.losspercent)
  //build the draw object
  let drawObj = {
    "odd": draw,
-   "betamt":parseFloat(drawOddAmt.toFixed(2)),
+   "betamt":drawOddAmt,
    "lossamt":drawLossAmt
  }
  oddsObj["draw"] = drawObj;
@@ -29,11 +30,10 @@ let lossPercent = parseFloat(req.losspercent)
 //build the low odd object
 let lowOddobj = {
   "odd":lowOdd[1],
-  "betamt":parseFloat(lowOddAmt.toFixed(2)),
+  "betamt":lowOddAmt,
   "totalwin":lowOddAmt * lowOdd[1],
-  "type":lowOdd[0]
 }
-oddsObj["low"] = lowOddobj;
+oddsObj[lowOdd[0]] = lowOddobj;
 
 //calculate bet amt on highest amt odd
 let highOdd = oddComparator(home,away,"high")
@@ -41,7 +41,7 @@ let highOddAmt = remAmt - lowOddAmt;
 //validate if bet fits profit criteria
 let highOddProfit = (highOdd[1] * highOddAmt ) - betAmt;
 let status = "";
-if(highOddProfit > 0 ){
+if(highOddAmt > 0 ){
   status = "positive"
 }else{
   status = "negative"
@@ -50,18 +50,14 @@ if(highOddProfit > 0 ){
 //build the high odd obj
 let highOddobj = {
   "odd" : highOdd[1],
-  "betamt" : parseFloat(highOddAmt.toFixed(2)),
+  "betamt" : highOddAmt,
   "totalwin" : highOdd[1] * highOddAmt,
-  "type":highOdd[0]
-}
-
-oddsObj["high"] = highOddobj;
-oddsObj["outcome"] = {
   "winamt" : highOddProfit,
   "status":status
 }
 
- return  oddsObj;
+oddsObj[highOdd[0]] = highOddobj;
+ return StdResponse("true", oddsObj);
 }
 
 function sortObject(obj){

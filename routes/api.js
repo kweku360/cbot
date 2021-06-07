@@ -17,10 +17,13 @@ router.get("/live/processstart", livebetting.startBetting);
 
 /* logging Routes . */
 router.get("/live/logs", loggingResource.startLog);
+router.get("/live/console/logs", loggingResource.startConsoleLog);
+
 
 /* Betshore Routes . */
 router.post("/live/betshore", aiResource.betShore);
 router.post("/live/betarb", aiResource.theArb);
+router.post("/live/revbetshore", aiResource.revBetShore);
 
 // /* Agents / vendors Routes. */
 // router.post("/serviceprovider/create", CreateProviderResource.create);

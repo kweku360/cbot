@@ -2,6 +2,7 @@ var StdResponse = require("../log/stdresponse");
 logArchitect = {}
 
 let cbotlogs = [];
+let cbotConsolelogs = [];
 
 logArchitect.setIteration = () =>{
     //adds an iteration to cbotlogs
@@ -28,9 +29,35 @@ logArchitect.addItem = (item) =>{
     // console.log(cbotlogs[cbotlogs.length-1])
     cbotlogs[cbotlogs.length-1] = {...cbotlogs[cbotlogs.length-1],...item}
 }
-  
 logArchitect.showLogs = () =>{
     return StdResponse("true", cbotlogs);
+}
+
+logArchitect.setConsoleIteration = () =>{
+    //adds an iteration to cbotlogs
+    if(cbotConsolelogs.length == 0){
+        //we have an empty log
+        const logItem = {
+            "id" : 1, 
+            "time": Date.now()
+        }
+        cbotConsolelogs.push(logItem)
+    }
+    else{
+        const logItem = {
+            "id" : cbotConsolelogs.length+1,
+            "time": Date.now()
+        }
+        cbotConsolelogs.push(logItem) 
+    }
+}
+
+logArchitect.addConsoleItem = (item) =>{
+    // console.log(cbotlogs[cbotlogs.length-1])
+    cbotConsolelogs[cbotConsolelogs.length-1] = {...cbotConsolelogs[cbotConsolelogs.length-1],...item}
+}
+logArchitect.showConsoleLogs = () =>{
+    return StdResponse("true", cbotConsolelogs);
 }
 
 module.exports = logArchitect;

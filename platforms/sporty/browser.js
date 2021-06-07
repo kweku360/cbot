@@ -6,6 +6,7 @@ async function startBrowser(){
     let browser;
     try {
         console.log("Opening the browser......");
+        logArchitect.addConsoleItem({"msg":"Opening Browser -----"});
         browser = await puppeteer.launch({
             headless: false,
             args: ["--disable-setuid-sandbox"],
@@ -26,7 +27,7 @@ function getCurrentPage(){
     if(page != null){
         return page;
     }
-    console.log("No page object has been set")
+    logArchitect.addConsoleItem({"msg":"No page object has been set"});
  }
 
 module.exports = {

@@ -6,4 +6,9 @@ loggingResource.startLog = (req, res) => {
   res.send(logArchitect.showLogs())
 }
 
+loggingResource.startConsoleLog = (req, res) => {
+  //   logArchitect.showLogs();
+    res.send(logArchitect.showConsoleLogs())
+  }
+
 module.exports = loggingResource;

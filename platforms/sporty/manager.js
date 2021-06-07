@@ -19,14 +19,14 @@ sportyManager.startBetting = async () => {
 
     page.waitForTimeout(5000).then(()=>{
         betArchitect.architect(page);
-        setInterval(initBetting,120000,page) 
+        setInterval(initBetting,180000,page) 
     })
-   
-   console.log("here we are");
+    logArchitect.addConsoleItem({"msg":"Started Betting Process"});
 };
 
 function initBetting(page){
     logManager.setIteration();
+    logManager.setConsoleIteration();
  page.reload().then(()=>betArchitect.architect(page))
     
 }

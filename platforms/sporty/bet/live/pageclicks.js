@@ -13,8 +13,7 @@ pageClicks.clickLiveBet = async (page) => {
         await page.waitForSelector('.m-nav-wrapper > .m-nav-main > #topHeader > #header_nav_liveBetting > span')
         await page.click('.m-nav-wrapper > .m-nav-main > #topHeader > #header_nav_liveBetting > span')
     }catch(e){
-        console.log("unable to click live bet");
-        //await page.reload();
+        logArchitect.addConsoleItem({"msg":"Live bet Click Error","error":e});
     }
 };
 /*
@@ -27,7 +26,7 @@ pageClicks.clickMultipleBet = async (page) => {
         await page.waitForSelector('.m-nav-bar > .m-nav > .m-header-item > #header > .m-flex-item:nth-child(1)')
         await page.click('.m-nav-bar > .m-nav > .m-header-item > #header > .m-flex-item:nth-child(1)')
     }catch(e){
-        console.log("unable to click multiple bet");
+        logArchitect.addConsoleItem({"msg":"Multiple bet Click Error","error":e});
     }
 
 };
