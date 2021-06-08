@@ -4,7 +4,7 @@
  * @kwekukankam - chancebot 2021
  */
 var accountResource = require("../../account/accountmanager");
-var logArchitect = require("../../log/architect");
+var logArchitect = require("../../../../managers/log/architect");
 PlaceBetOneXTwo = {}
 
 PlaceBetOneXTwo.live = async (page, betAmt,currentOdd,currentleague,currentgame,outcomechild) => {

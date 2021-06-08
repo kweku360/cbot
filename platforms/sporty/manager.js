@@ -1,8 +1,8 @@
 //implementation of a account to a betting platform feature
-var { startBrowser,getCurrentPage } = require("./browser");
+var { startBrowser,getCurrentPage } = require("../../managers/app/browser");
 var loginManager = require("./login/login");
 var betArchitect = require("./bet/architect");
-var logManager = require("./log/architect");
+var logManager = require("../../managers/log/architect");
 sportyManager = {};
 
 
@@ -18,6 +18,8 @@ sportyManager.startBetting = async () => {
     //start bet process after login
 
     page.waitForTimeout(5000).then(()=>{
+        logManager.setIteration();
+        logManager.setConsoleIteration();
         betArchitect.architect(page);
         setInterval(initBetting,180000,page) 
     })

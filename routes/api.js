@@ -1,6 +1,5 @@
 var express = require("express");
 var router = express.Router();
-const login = require("../managers/login/login")
 const account = require("../app/../managers/account/accountmanager")
 const livebetting = require("../app/http/betmanager")
 const loggingResource = require("../app/http/logmanager")

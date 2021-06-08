@@ -7,7 +7,7 @@ var PlaceBetOneXTwo = require("./placebetonextwo");
 var PlaceBetReverse = require("./placebetreverse");
 var reverseBetShore = require("./reversebetshore");
 const activeGameLog = require("../../../../managers/log/activegameslog");
-const logArchitect = require("../../log/architect");
+const logArchitect = require("../../../../managers/log/architect");
 GamePicker = {}
 
 /*
@@ -61,14 +61,16 @@ GamePicker.pickGame = async (page) => {
                             if (lowBet == 1) {
                                 const highbet = await PlaceBetReverse.live(page, 1/*isBet[1].low.betamt bet amount*/, isBet[1].high.odd/*odds value*/, i, j, checktype(isBet[1].high.type));
                                 if (highbet == 1) {
+                                    var bSuccess = {
+                                        "msg":betSuccess,
+                                        "gameinfo":gameInfo,
+                                        "betinfo":isBet[1]
+                                    }
+                                    logArchitect.addItem({data:bSuccess})
+                                    
                                     PlaceBetReverse.live(page, 1/*isBet[1].low.betamt bet amount*/, isBet[1].draw.odd/*odds value*/, i, j, 2);
                                     // we log succesfull bets here
-                                   var bSuccess = {
-                                       "msg":betSuccess,
-                                       "gameinfo":gameInfo,
-                                       "betinfo":isBet[1]
-                                   }
-                                   logArchitect.addItem({data:bSuccess})
+
                                 }
 
                             } else {

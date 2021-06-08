@@ -1,5 +1,5 @@
-const { showLogs } = require("../../platforms/sporty/log/architect");
-var StdResponse = require("./stdresponse");
+const logArchitect = require("./architect");
+
 activeGameLog = {}
 
 let gameLog = [];
@@ -23,8 +23,7 @@ activeGameLog.verifyGame = (item) =>{
 }
   
 activeGameLog.showLogs = () =>{
-    console.log(gameLog)
-    //return StdResponse("true", gameLog);
+    logArchitect.addConsoleItem({"activegamelog":gameLog});
 }
 
 module.exports = activeGameLog;
