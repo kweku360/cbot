@@ -8,8 +8,8 @@ async function startBrowser(){
         console.log("Opening the browser......");
         logArchitect.addConsoleItem({"msg":"Opening Browser -----"});
         browser = await puppeteer.launch({
-            headless: false,
-            args: ["--disable-setuid-sandbox"],
+            headless: true,
+            args: ['--no-sandbox',"--disable-setuid-sandbox"],
             'ignoreHTTPSErrors': true
         });
     } catch (err) {
