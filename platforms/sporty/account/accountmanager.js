@@ -21,7 +21,7 @@ accountResource.accountBalance = async (page) => {
         });
         return checkBalance;
     })
-    console.log(balance);
+    // console.log(balance);
     return balance
 };
 

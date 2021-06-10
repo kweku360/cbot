@@ -8,6 +8,10 @@ var PlaceBetReverse = require("./placebetreverse");
 var reverseBetShore = require("./reversebetshore");
 const activeGameLog = require("../../../../managers/log/activegameslog");
 const logArchitect = require("../../../../managers/log/architect");
+var dotenv = require("dotenv");
+
+dotenv.config();
+
 GamePicker = {}
 
 /*
@@ -52,23 +56,23 @@ GamePicker.pickGame = async (page) => {
                     if (isBet[0] == 1 /*true*/) {
                         
                         //now check if bet has been place for this game before
-                        if (activeGameLog.verifyGame(gameInfo.gameid) == true && gameInfo.minutesplayed < 30) {
+                        if (activeGameLog.verifyGame(gameInfo.gameid) == true && gameInfo.minutesplayed < 60) {
                             //add to log
                             activeGameLog.additem(gameInfo.gameid);
                             //low odd
-                            const lowBet = await PlaceBetReverse.live(page, 1/*isBet[1].low.betamt bet amount*/, isBet[1].low.odd/*odds value*/, i, j, checktype(isBet[1].low.type));
+                            const lowBet = await PlaceBetReverse.live(page, isBet[1].low.betamt, isBet[1].low.odd/*odds value*/, i, j, checktype(isBet[1].low.type));
 
                             if (lowBet == 1) {
-                                const highbet = await PlaceBetReverse.live(page, 1/*isBet[1].low.betamt bet amount*/, isBet[1].high.odd/*odds value*/, i, j, checktype(isBet[1].high.type));
+                                const highbet = await PlaceBetReverse.live(page,isBet[1].high.betamt, isBet[1].high.odd/*odds value*/, i, j, checktype(isBet[1].high.type));
                                 if (highbet == 1) {
                                     var bSuccess = {
-                                        "msg":betSuccess,
+                                        "msg":"Bet Successfull",
                                         "gameinfo":gameInfo,
                                         "betinfo":isBet[1]
                                     }
-                                    logArchitect.addItem({data:bSuccess})
+                                    logArchitect.addItem({"data":bSuccess})
                                     
-                                    PlaceBetReverse.live(page, 1/*isBet[1].low.betamt bet amount*/, isBet[1].draw.odd/*odds value*/, i, j, 2);
+                                    PlaceBetReverse.live(page, isBet[1].draw.betamt, isBet[1].draw.odd/*odds value*/, i, j, 2);
                                     // we log succesfull bets here
 
                                 }
@@ -81,14 +85,16 @@ GamePicker.pickGame = async (page) => {
                         }else{
                             logArchitect.addConsoleItem({"activegamelog":activeGameLog.showLogs()});
                             }
-                    } else { }
+                    } else {
+                        logArchitect.addConsoleItem({"msg":"No bet match for this iteration"});
+                     }
                 }
 
             }
 
         }
     } catch (error) {
-        logArchitect.addConsoleItem({"msg":"Navigation Error","error":error});
+        logArchitect.addConsoleItem({"msg":"Navigation Error","error":error.toString()});
     }
 }
 
@@ -104,8 +110,8 @@ function revBetShore(odds) {
         "draw": odds[1],
         "home": odds[0],
         "away": odds[2],
-        "betamt": 10,
-        "losspercent": 50
+        "betamt": process.env.BETAMOUNT,
+        "losspercent": process.env.LOSSPERCENT
     }
 
     var revbshore = reverseBetShore.run(drawObj)

@@ -7,11 +7,12 @@ let lossPercent = parseFloat(req.losspercent)
  let home = parseFloat(req.home)
  let draw = parseFloat(req.draw)
  let away = parseFloat(req.away)
- let padAmt = 2; //bias amt for low odd - defaults to 10
+ let padAmt = 1; //bias amt for low odd - defaults to 10
 
  let oddsObj = {}
 
  //calculate draw odd
+ let lossAmt = (lossPercent / 100) * betAmt;
  let drawLossAmt =  betAmt - ((lossPercent / 100) * betAmt);
  let drawOddAmt = drawLossAmt /draw; //amt to bet on the draw odd.
  let remAmt = betAmt - drawOddAmt; //the ant left for the other two odds;
@@ -20,7 +21,7 @@ let lossPercent = parseFloat(req.losspercent)
  let drawObj = {
    "odd": draw,
    "betamt":drawOddAmt,
-   "lossamt":drawLossAmt
+   "lossamt":lossAmt
  }
  oddsObj["draw"] = drawObj;
 
@@ -41,7 +42,7 @@ let highOddAmt = remAmt - lowOddAmt;
 //validate if bet fits profit criteria
 let highOddProfit = (highOdd[1] * highOddAmt ) - betAmt;
 let status = "";
-if(highOddAmt > 0 ){
+if(highOddProfit > 0 ){
   status = "positive"
 }else{
   status = "negative"
