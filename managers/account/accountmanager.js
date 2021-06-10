@@ -20,8 +20,7 @@ accountResource.accountBalance = async (page) => {
             }
         });
         return checkBalance;
-    })
-    console.log(balance);
+    })  
     return balance
 };
 

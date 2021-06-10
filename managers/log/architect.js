@@ -34,7 +34,6 @@ logArchitect.showLogs = () =>{
 }
 
 logArchitect.setConsoleIteration = () =>{
-    console.log("item here");
     //adds an iteration to cbotlogs
     if(cbotConsolelogs.length == 0){
         //we have an empty log
@@ -58,7 +57,6 @@ logArchitect.addConsoleItem = (item) =>{
     cbotConsolelogs[cbotConsolelogs.length-1] = {...cbotConsolelogs[cbotConsolelogs.length-1],...item}
 }
 logArchitect.showConsoleLogs = () =>{
-    console.log("herer we are")
     return StdResponse("true", cbotConsolelogs);
 }
 
