@@ -9,7 +9,7 @@ async function startBrowser(){
         logArchitect.addConsoleItem({"msg":"Opening Browser -----"});
         browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox',"--disable-setuid-sandbox"],
+            args: ["--no-sandbox","--disable-setuid-sandbox"],
             'ignoreHTTPSErrors': true
         });
     } catch (err) {

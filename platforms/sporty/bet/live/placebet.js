@@ -1,29 +1,27 @@
 /*
  * PlaceBet
- * Places bet on provided market and odds (with validations)
+ * Places bet on 1 x 2 markets and odds (with validations)
  * @kwekukankam - chancebot 2021
  */
 var accountResource = require("../../account/accountmanager");
-var logArchitect = require("../../../../managers/log/architect")
+var logArchitect = require("../../../../managers/log/architect");
 PlaceBet = {}
 
-PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) => {
+PlaceBet.live = async (page, betAmt,currentOdd,currentleague,currentgame,outcomechild) => {
     try {
-        // clear bet slip
-        PlaceBet.clearBetSlip(page);
-
         //check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
+        await accountResource.BetBalanceVerify(page)
         if (accBal < betAmt) {
             //log
-            console.log("insuffiecient funds to make bet")
-            logArchitect.addItem({ "Bet Status": `insuffiecient funds to make bet -  ${accBal} Ghs` })
-            return;
+            logArchitect.addConsoleItem({ "msg": `insuffiecient funds to make bet -  ${accBal} Ghs` })
+            return 0;
         }
 
-        //click on item
-        await page.waitForSelector(`.m-table__wrapper:nth-child(${marketCountItem}) > .m-table > .m-table-row > .m-table-cell:nth-child(${outcomeValue}) > .m-table-cell-item:nth-child(2)`)
-        await page.click(`.m-table__wrapper:nth-child(${marketCountItem}) > .m-table > .m-table-row > .m-table-cell:nth-child(${outcomeValue}) > .m-table-cell-item:nth-child(2)`)
+        //click on odds
+        let rowval = (currentgame == 1) ? ".match-row" : `.match-row:nth-child(${currentgame})`;
+        await page.waitForSelector(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
+        await page.click(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
 
         // change value
         await page.waitForSelector('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input')
@@ -31,7 +29,7 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
         await input.click({ clickCount: 3 })
         await page.type('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input', `${betAmt}`)
 
-        if(placeBet.validateBetOdd(page,currentOdd)){
+        if(PlaceBet.validateBetOdd(page,currentOdd)){
                     //click on place bet
         const acceptBet = await page.evaluate(() => {
             const wrapper = document.querySelector(`.m-betslips > .m-stake > div > .m-btn-wrapper > .af-button > span`)
@@ -39,39 +37,37 @@ PlaceBet.live = async (page, marketCountItem, outcomeValue, betAmt,currentOdd) =
             return wrapper.innerHTML.trim;
         }); 
 
-        console.log(acceptBet)
-
         if (acceptBet == "Accept Changes") {
-            console.log("changes")
+            //do something later
         }
 
         await page.waitForSelector('.m-stake > div > .m-btn-wrapper > .af-button > span')
         await page.click('.m-stake > div > .m-btn-wrapper > .af-button > span')
         
-        if(placeBet.validateBetOdd(page,currentOdd)){
+        
+        if(PlaceBet.validateBetOdd(page,currentOdd)){
         // click on final bet
         await page.waitForSelector('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
         await page.click('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
         }
 
 
-        console.log("bet Placed") 
+        logArchitect.addConsoleItem({"msg":"Bet Placed"})
 
-        logArchitect.addItem({ "BetStatus": `Bet Placed` })
-
-        await page.waitForTimeout(5000).then(async () => await page.reload())
+       return await page.waitForTimeout(15000).then(async () => {
+        await page.waitForSelector('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close')
+         return await page.click('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close').then(()=> {return 1})
+        
+       })
         } else{
-
-            console.log("No Bet Placed") 
-
-            logArchitect.addItem({ "Bet Status": `No Bet Placed - Non Matching Odds` })
+            logArchitect.addConsoleItem({"msg":"unable to place bet"})
+            return 0;
         }
 
-
-
     } catch (error) {
-        console.log(error);
-        console.log("Unable to Place Bet Now")
+        logArchitect.addConsoleItem({"msg":"unable to place bet","error":error.toString()});
+        await page.reload()
+        return 0
     }
 }
 
