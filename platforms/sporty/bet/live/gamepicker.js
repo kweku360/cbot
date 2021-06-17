@@ -56,7 +56,7 @@ GamePicker.pickGame = async (page) => {
                     if (isBet[0] == 1 /*true*/) {
                         
                         //now check if bet has been place for this game before
-                        if (activeGameLog.verifyGame(gameInfo.gameid) == true && gameInfo.minutesplayed < 60) {
+                        if (activeGameLog.verifyGame(gameInfo.gameid) == true && gameInfo.minutesplayed < process.env.GAMETIME) {
                             //add to log
                             activeGameLog.additem(gameInfo.gameid);
                             //low odd
