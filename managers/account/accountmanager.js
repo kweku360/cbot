@@ -23,5 +23,11 @@ accountResource.accountBalance = async (page) => {
     })  
     return balance
 };
+accountResource.BetBalanceVerify = async (page) => {
+  let openingbalance = 20 //initial opening balance
+  const betvalue = 2 //amount set for a single bet
+
+
+};
 
 module.exports = accountResource;

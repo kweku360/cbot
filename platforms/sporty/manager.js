@@ -12,7 +12,7 @@ sportyManager.startBetting = async () => {
     // Navigate to the selected page
     await page.goto('https://www.sportybet.com/gh/')
   
-    await page.setViewport({ width: 1920, height: 912 })
+    // await page.setViewport({ width: 1920, height: 912 })
     //login here
     loginManager.login(page);
     //start bet process after login

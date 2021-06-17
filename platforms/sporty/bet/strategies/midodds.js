@@ -1,11 +1,9 @@
 /*
- * GamePicker
- * Picks a single game (randomly).
+ * GamePicker - Mid Odds low Stake
+ * Places a net on a mid betting range 
  * @kwekukankam - chancebot 2021
  */
-var PlaceBetOneXTwo = require("./placebetonextwo");
-var PlaceBetReverse = require("./placebetreverse");
-var reverseBetShore = require("./reversebetshore");
+const PlaceBet = require("../live/placebet");
 const activeGameLog = require("../../../../managers/log/activegameslog");
 const logArchitect = require("../../../../managers/log/architect");
 var accountResource = require("../../account/accountmanager");
@@ -39,7 +37,6 @@ GamePicker.pickGame = async (page) => {
 
         const betverify = await accountResource.BetBalanceVerify(page);
         console.log(betverify);
-        // console.log("data : " + data);
         //loop through each live league
         mainLoop:
         for (let i = 1; i <= data; i++) {
@@ -55,87 +52,46 @@ GamePicker.pickGame = async (page) => {
                 const gameInfo = await pickedGameInfo(page, i, j);
                 if (gameOdd[0] != 0) {
                     const bLow = await lowOddHighStake(gameOdd);
-                    if(bLow[0]  == 0){
+                    if (bLow[0] == 0) {
                         console.log("Found Correct Range")
-                        console.log(gameOdd);
-                        console.log(bLow);
-                        console.log(gameInfo)
                         //place bet
-                        if (activeGameLog.verifyGame(gameInfo.gameid) == true ){
+                        if (activeGameLog.verifyGame(gameInfo.gameid) == true) {
+                            console.log(betverify.code);
+                            if(betverify.code == "002"){
+                                // place bet
+                            const placedBet = await PlaceBet.live
+                            (page, 2/*bet amt*/, bLow[1]/*odds value*/, i, j, bLow[2]);
+                            //finally log
+                            if (placedBet == 1) {
+                                //add log
+                                activeGameLog.additem(gameInfo.gameid);
+                                var bSuccess = {
+                                    "msg": "Bet Successfull", "gameinfo": gameInfo, "betodds": gameOdd
+                                }
+                                logArchitect.addItem({ "data": bSuccess })
+                            }
+                            break mainLoop;
 
+                            }else{
+                                logArchitect.addConsoleItem({ "msg": "Bet Range Ecxeeded","Bet Difference":betverify.betdiff});
+                                break mainLoop;
+                            }
+
+                        } else {
+                            logArchitect.addConsoleItem({ "activegamelog": activeGameLog.showLogs() });
+                            
                         }
+                    } else {
+                        logArchitect.addConsoleItem({ "msg": "No bet match for this iteration" });
                     }
-                    
-                    // const isBet = await revBetShore(gameOdd);
-                    // if (isBet[0] == 1 /*true*/) {
-                        
-                    //     //now check if bet has been place for this game before
-                    //     if (activeGameLog.verifyGame(gameInfo.gameid) == true && gameInfo.minutesplayed < process.env.GAMETIME) {
-                    //         //add to log
-                    //         activeGameLog.additem(gameInfo.gameid);
-                    //         //low odd
-                    //         const lowBet = await PlaceBetReverse.live(page, isBet[1].low.betamt, isBet[1].low.odd/*odds value*/, i, j, checktype(isBet[1].low.type));
-
-                    //         if (lowBet == 1) {
-                    //             const highbet = await PlaceBetReverse.live(page,isBet[1].high.betamt, isBet[1].high.odd/*odds value*/, i, j, checktype(isBet[1].high.type));
-                    //             if (highbet == 1) {
-                    //                 var bSuccess = {
-                    //                     "msg":"Bet Successfull",
-                    //                     "gameinfo":gameInfo,
-                    //                     "betinfo":isBet[1]
-                    //                 }
-                    //                 logArchitect.addItem({"data":bSuccess})
-                                    
-                    //                 PlaceBetReverse.live(page, isBet[1].draw.betamt, isBet[1].draw.odd/*odds value*/, i, j, 2);
-                    //                 // we log succesfull bets here
-
-                    //             }
-
-                    //         } else {
-                    //             break mainLoop;
-                    //         }
-
-                    //         break mainLoop;
-                    //     }else{
-                    //         logArchitect.addConsoleItem({"activegamelog":activeGameLog.showLogs()});
-                    //         }
-                    // } else {
-                    //     logArchitect.addConsoleItem({"msg":"No bet match for this iteration"});
-                    //  }
-
-                    
                 }
 
             }
 
         }
     } catch (error) {
-        logArchitect.addConsoleItem({"msg":"Navigation Error","error":error.toString()});
-    }
-}
-
-/*
- * converts home away values to 1x2
- */
-function checktype(type) {
-    if (type == "home") return 1;
-    if (type == "away") return 3;
-}
-function revBetShore(odds) {
-    let drawObj = {
-        "draw": odds[1],
-        "home": odds[0],
-        "away": odds[2],
-        "betamt": process.env.BETAMOUNT,
-        "losspercent": process.env.LOSSPERCENT
-    }
-
-    var revbshore = reverseBetShore.run(drawObj)
-    //show only positives -- todo greater than 2gh
-    if (revbshore.outcome.status == "positive") {
-        return [1, revbshore];
-    } else {
-         return [0];
+        logArchitect.addConsoleItem({ "msg": "Navigation Error", "error": error.toString() });
+        await page.reload();
     }
 }
 
@@ -144,7 +100,7 @@ function revBetShore(odds) {
  */
 async function pickedGameInfo(page, currentleague, currentgame) {
     let rowval = (currentgame == 1) ? ".match-row" : `.match-row:nth-child(${currentgame})`;
-    const currentTime = await timerCheck(currentleague,currentgame, page);
+    const currentTime = await timerCheck(currentleague, currentgame, page);
     let gameInfoObj = {}
     const homeTeam = await page.$eval(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .left-team-table > .teams > .home-team`, el => el.innerHTML);
     const awayTeam = await page.$eval(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .left-team-table > .teams > .away-team`, el => el.innerHTML);
@@ -165,7 +121,7 @@ async function pickedGameInfo(page, currentleague, currentgame) {
 
 }
 
-async function timerCheck(currentLeaguePick,currentgame, page) {
+async function timerCheck(currentLeaguePick, currentgame, page) {
     let rowval = (currentgame == 1) ? ".match-row" : `.match-row:nth-child(${currentgame})`;
     const matchTime = await page.$eval(`.m-table:nth-child(${currentLeaguePick}) > ${rowval} > .m-table-cell > .left-team-table > .time > .clock-time`, el => el.innerHTML);
 
@@ -216,17 +172,6 @@ async function singleOdd(page, currentleague, currentgame, outcomechild) {
             return 0;
         }
     }, currentleague, currentgame, outcomechild);
-}
-
-async function goalChecker(page, currentLeaguePick) {
-    const homeScore = await page.$eval(`.m-table:nth-child(${currentLeaguePick}) > .m-table-row > .m-table-cell > .left-team-table > .score > .score-item:nth-child(1)`, el => el.innerHTML);
-    const awayScore = await page.$eval(`.m-table:nth-child(${currentLeaguePick}) > .m-table-row > .m-table-cell > .left-team-table > .score > .score-item:nth-child(2)`, el => el.innerHTML);
-    let goalDiff = parseInt(homeScore.trim()) - parseInt(awayScore.trim())
-    if (goalDiff < 0) {
-        goalDiff = goalDiff * -1;
-
-    }
-    console.log("Diff " + goalDiff)
 }
 
 module.exports = GamePicker

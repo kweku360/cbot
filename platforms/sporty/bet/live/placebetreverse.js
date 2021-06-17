@@ -11,57 +11,58 @@ PlaceBetReverse.live = async (page, betAmt,currentOdd,currentleague,currentgame,
     try {
         //check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
+        await accountResource.BetBalanceVerify(page)
         if (accBal < betAmt) {
             //log
             logArchitect.addConsoleItem({ "msg": `insuffiecient funds to make bet -  ${accBal} Ghs` })
             return 0;
         }
 
-        //click on odds
-        let rowval = (currentgame == 1) ? ".match-row" : `.match-row:nth-child(${currentgame})`;
-        await page.waitForSelector(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
-        await page.click(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
+    //     //click on odds
+    //     let rowval = (currentgame == 1) ? ".match-row" : `.match-row:nth-child(${currentgame})`;
+    //     await page.waitForSelector(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
+    //     await page.click(`.m-table:nth-child(${currentleague}) > ${rowval} > .m-table-cell > .m-market:nth-child(1) > .m-outcome:nth-child(${outcomechild}) > .m-outcome-odds`)
 
-        // change value
-        await page.waitForSelector('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input')
-        const input = await page.$('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input');
-        await input.click({ clickCount: 3 })
-        await page.type('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input', `${betAmt}`)
+    //     // change value
+    //     await page.waitForSelector('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input')
+    //     const input = await page.$('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input');
+    //     await input.click({ clickCount: 3 })
+    //     await page.type('.m-line-wrapper > .m-value > #j_stake_0 > .m-input-com > .m-input', `${betAmt}`)
 
-        if(PlaceBetReverse.validateBetOdd(page,currentOdd)){
-                    //click on place bet
-        const acceptBet = await page.evaluate(() => {
-            const wrapper = document.querySelector(`.m-betslips > .m-stake > div > .m-btn-wrapper > .af-button > span`)
-            // console.log(wrapper.innerHTML)
-            return wrapper.innerHTML.trim;
-        }); 
+    //     if(PlaceBetReverse.validateBetOdd(page,currentOdd)){
+    //                 //click on place bet
+    //     const acceptBet = await page.evaluate(() => {
+    //         const wrapper = document.querySelector(`.m-betslips > .m-stake > div > .m-btn-wrapper > .af-button > span`)
+    //         // console.log(wrapper.innerHTML)
+    //         return wrapper.innerHTML.trim;
+    //     }); 
 
-        if (acceptBet == "Accept Changes") {
-            //do something later
-        }
+    //     if (acceptBet == "Accept Changes") {
+    //         //do something later
+    //     }
 
-        await page.waitForSelector('.m-stake > div > .m-btn-wrapper > .af-button > span')
-        await page.click('.m-stake > div > .m-btn-wrapper > .af-button > span')
+    //     await page.waitForSelector('.m-stake > div > .m-btn-wrapper > .af-button > span')
+    //     await page.click('.m-stake > div > .m-btn-wrapper > .af-button > span')
         
         
-        if(PlaceBetReverse.validateBetOdd(page,currentOdd)){
-        // click on final bet
-        await page.waitForSelector('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
-        await page.click('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
-        }
+    //     if(PlaceBetReverse.validateBetOdd(page,currentOdd)){
+    //     // click on final bet
+    //     await page.waitForSelector('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
+    //     await page.click('.m-comfirm-wrapper > div > .m-btn-wrapper > .af-button--primary > span')
+    //     }
 
 
-        logArchitect.addConsoleItem({"msg":"Bet Placed"})
+    //     logArchitect.addConsoleItem({"msg":"Bet Placed"})
 
-       return await page.waitForTimeout(10000).then(async () => {
-        await page.waitForSelector('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close')
-         return await page.click('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close').then(()=> {return 1})
+    //    return await page.waitForTimeout(10000).then(async () => {
+    //     await page.waitForSelector('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close')
+    //      return await page.click('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close').then(()=> {return 1})
         
-       })
-        } else{
-            logArchitect.addConsoleItem({"msg":"unable to place bet"})
-            return 0;
-        }
+    //    })
+    //     } else{
+    //         logArchitect.addConsoleItem({"msg":"unable to place bet"})
+    //         return 0;
+    //     }
 
     } catch (error) {
         logArchitect.addConsoleItem({"msg":"unable to place bet","error":error});
