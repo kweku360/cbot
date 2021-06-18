@@ -32,14 +32,13 @@ accountResource.accountBalance = async (page) => {
 accountResource.BetBalanceVerify = async (page) => {
     let balverify = {}
     const currentbalance = await accountResource.accountBalance(page);
-    console.log(currentbalance)
     let openingbalance = process.env.OPENING_BET //initial opening balance
     const betvalue = process.env.MIDODD_BETAMT //amount set for a single bet
     let bCount = await betCount(page);
     const totalbetamt = betvalue * bCount;
     const amtavailable = currentbalance + totalbetamt;
     const betdiff = amtavailable - openingbalance;
-    console.log(betdiff)
+    console.log({"currentBalance": currentbalance,"betdiff":betdiff})
     //iffs
     if(betdiff >= process.env.MIDODD_BETLIMIT){
         //we cease bet

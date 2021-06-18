@@ -1,12 +1,12 @@
 /*
  * GamePicker - Mid Odds low Stake
  * Places a net on a mid betting range 
- * @kwekukankam - chancebot 2021
+ * @kwekukankam - chancebot 2021 (betway)
  */
-const PlaceBet = require("../live/placebet");
+// const PlaceBet = require("../live/placebet");
 const activeGameLog = require("../../../../managers/log/activegameslog");
 const logArchitect = require("../../../../managers/log/architect");
-var accountResource = require("../../account/accountmanager");
+// var accountResource = require("../../account/accountmanager");
 var dotenv = require("dotenv");
 
 dotenv.config();
@@ -21,76 +21,77 @@ GamePicker = {}
 GamePicker.pickGame = async (page) => {
 
     try {
-        const navigationPromise = page.waitForNavigation();
-        await navigationPromise;
-
-        // //click on efootball(test)
-        // await page.waitForSelector('div > .m-overview > .sport-name > .sport-name-item:nth-child(1) > .text')
-        // await page.click('div > .m-overview > .sport-name > .sport-name-item:nth-child(1) > .text')
-
         //get total live leagues available
-        await page.waitForSelector('.m-overview > .match > .m-table')
+        await page.waitForSelector('.eventRow')
         const data = await page.evaluate(() => {
-            const wrapper = Array.from(document.querySelectorAll('.m-overview > .match > .m-table'))
+            const wrapper = Array.from(document.querySelectorAll('.eventRow'))
             return wrapper.length;
         });
-
-        const betverify = await accountResource.BetBalanceVerify(page);
-        console.log(betverify);
-        //loop through each live league
-        mainLoop:
+        console.log(data);
         for (let i = 1; i <= data; i++) {
-            //get count of games available for a picked league
-            const gameCount = await page.evaluate((val) => {
-                //we change to match row to test something (original m-table-row)
-                const wrapper = Array.from(document.querySelectorAll(`.m-overview > .match > .m-table:nth-child(${val}) > .match-row`))
-                return wrapper.length;
-            }, i);
-
-            for (let j = 1; j <= gameCount; j++) {
-                const gameOdd = await pickMarket(i, j, page);
-                const gameInfo = await pickedGameInfo(page, i, j);
-                if (gameOdd[0] != 0) {
-                    const bLow = await lowOddHighStake(gameOdd);
-                    console.log(bLow);
-                    if (bLow[0] == 0 && bLow[2] != 2) {
-                        //place bet
-                        if (activeGameLog.verifyGame(gameInfo.gameid) == true) {
-                            if(betverify.code == "002"){
-                                // place bet
-                            const placedBet = await PlaceBet.live
-                            (page, 2/*bet amt*/, bLow[1]/*odds value*/, i, j, bLow[2]);
-                            //finally log
-                            if (placedBet == 1) {
-                                //add log
-                                activeGameLog.additem(gameInfo.gameid);
-                                var bSuccess = {
-                                    "msg": "Bet Successfull", "gameinfo": gameInfo, "betodds": gameOdd
-                                }
-                                logArchitect.addItem({ "data": bSuccess })
-                            }
-                            break mainLoop;
-
-                            }else{
-                                logArchitect.addConsoleItem({ "msg": "Bet Range Ecxeeded","Bet Difference":betverify.betdiff});
-                                break mainLoop;
-                            }
-
-                        } else {
-                            logArchitect.addConsoleItem({ "activegamelog": activeGameLog.showLogs() });
-                            
-                        }
-                    } else {
-                        logArchitect.addConsoleItem({ "msg": "No bet match for this iteration" });
-                    }
-                }
-
-            }
-
+            label__league_title
+            const data = await page.evaluate(() => {
+                // const homeTeam = await page.$eval(`.eventRow > .label__league_title`, el => el.innerHTML);
+                // return wrapper.length;
+            });
         }
+        // const betverify = await accountResource.BetBalanceVerify(page);
+        // console.log(betverify);
+        //loop through each live league
+        // mainLoop:
+        // for (let i = 1; i <= data; i++) {
+        //     //get count of games available for a picked league
+        //     const gameCount = await page.evaluate((val) => {
+        //         //we change to match row to test something (original m-table-row)
+        //         const wrapper = Array.from(document.querySelectorAll(`.m-overview > .match > .m-table:nth-child(${val}) > .match-row`))
+        //         return wrapper.length;
+        //     }, i);
+
+        //     for (let j = 1; j <= gameCount; j++) {
+        //         const gameOdd = await pickMarket(i, j, page);
+        //         const gameInfo = await pickedGameInfo(page, i, j);
+        //         if (gameOdd[0] != 0) {
+        //             const bLow = await lowOddHighStake(gameOdd);
+        //             if (bLow[0] == 0) {
+        //                 console.log("Found Correct Range")
+        //                 //place bet
+        //                 if (activeGameLog.verifyGame(gameInfo.gameid) == true) {
+        //                     console.log(betverify.code);
+        //                     if(betverify.code == "002"){
+        //                         // place bet
+        //                     const placedBet = await PlaceBet.live
+        //                     (page, 2/*bet amt*/, bLow[1]/*odds value*/, i, j, bLow[2]);
+        //                     //finally log
+        //                     if (placedBet == 1) {
+        //                         //add log
+        //                         activeGameLog.additem(gameInfo.gameid);
+        //                         var bSuccess = {
+        //                             "msg": "Bet Successfull", "gameinfo": gameInfo, "betodds": gameOdd
+        //                         }
+        //                         logArchitect.addItem({ "data": bSuccess })
+        //                     }
+        //                     break mainLoop;
+
+        //                     }else{
+        //                         logArchitect.addConsoleItem({ "msg": "Bet Range Ecxeeded","Bet Difference":betverify.betdiff});
+        //                         break mainLoop;
+        //                     }
+
+        //                 } else {
+        //                     logArchitect.addConsoleItem({ "activegamelog": activeGameLog.showLogs() });
+                            
+        //                 }
+        //             } else {
+        //                 logArchitect.addConsoleItem({ "msg": "No bet match for this iteration" });
+        //             }
+        //         }
+
+        //     }
+
+        // }
     } catch (error) {
-        logArchitect.addConsoleItem({ "msg": "Navigation Error", "error": error.toString() });
-        await page.reload();
+        // logArchitect.addConsoleItem({ "msg": "Navigation Error", "error": error.toString() });
+        // await page.reload();
     }
 }
 
