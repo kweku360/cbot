@@ -26,5 +26,6 @@ router.post("/live/revbetshore", aiResource.revBetShore);
 
 // ChanceBot v2 routes {/v2/{strategy}/action}
 router.get("/v2/betshore/all", sportyManager.betShoreAll);
+router.get("/v2/polaris/start", sportyManager.polaris);
 
 module.exports = router;

@@ -91,6 +91,7 @@ PlaceBet.clearBetSlip = async (page) => {
         const wrapper = document.querySelector(`.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count`)
         return wrapper.innerHTML;
     });
+    
     if (betslip != "") {
         try {
             await page.waitForSelector('.m-item:nth-child(1) > .m-lay-mid > .m-lay-mid > .m-item-play > .m-icon-delete')

@@ -1,8 +1,9 @@
 /*
  * PageNavigation
  * Handle various page navigations through mouse clicks here
- * @kwekukankam - chancebot 2021
+ * @kwekukankam - cbot 2023
  */
+var State = require("../../../../state");
 var pageNavigate = {};
 
 /*
@@ -17,7 +18,6 @@ pageNavigate.toLiveBet = async (page) => {
       ".m-nav-wrapper > .m-nav-main > #topHeader > #header_nav_liveBetting > span"
     );
   } catch (e) {
-    console.log("to live bet :" + e.toString())
     // logArchitect.addConsoleItem({"msg":"Live bet Click Error","error":e.toString()});
   }
 };
@@ -26,6 +26,8 @@ pageNavigate.toLiveBet = async (page) => {
  */
 pageNavigate.toMultipleBet = async (page) => {
   try {
+    const navigationPromise = page.waitForNavigation();
+    await navigationPromise;
     await page.waitForSelector(
       ".m-nav-bar > .m-nav > .m-header-item > #header > .m-flex-item:nth-child(1)"
     );
@@ -33,7 +35,22 @@ pageNavigate.toMultipleBet = async (page) => {
       ".m-nav-bar > .m-nav > .m-header-item > #header > .m-flex-item:nth-child(1)"
     );
   } catch (e) {
-    console.log("to Multiple bet :" + e.toString())
+    // logArchitect.addConsoleItem({"msg":"Multiple bet Click Error","error":e.toString()});
+  }
+};
+pageNavigate.toActiveGame = async (page) => {
+  try {
+    //get active game
+    const activeGame = State.activeGame.find(x=>x.active === true);
+    console.log(State.activeGame)
+    if(activeGame){
+      console.log("hello")
+      await page.waitForSelector(`.m-table-row:nth-child(${activeGame.meta.position[1]+1}) > .m-table-cell > .left-team-table > .teams > .home-team`)
+      await page.click(`.m-table-row:nth-child(${activeGame.meta.position[1]+1}) > .m-table-cell > .left-team-table > .teams > .home-team`)
+      //move active to the next position
+      }
+  } catch (e) {
+      console.log(e.toString());
     // logArchitect.addConsoleItem({"msg":"Multiple bet Click Error","error":e.toString()});
   }
 };
