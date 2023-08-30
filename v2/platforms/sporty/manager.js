@@ -30,7 +30,7 @@ sportyManager.polaris = async (req, res) => {
   page.waitForTimeout(5000).then(() => {
     Polaris.architect(page);
     res.send("polaris activated");
-    setInterval(initBetting,120000,page) 
+    setInterval(initBetting,90000,page) 
   });
 };
 
