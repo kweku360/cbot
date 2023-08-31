@@ -124,15 +124,15 @@ const pickMarket = async (page, activeGame) => {
                         return 0;
                     }
                 }, marketCountItem, k);
-                const marketName = await page.$eval(
-                    `.m-table__wrapper:nth-child(${outcome}) > .m-table > .m-table-row > .m-table-cell > .m-table-header-title`,
-                    (el) => el.innerHTML
-                );
+                // const marketName = await page.$eval(
+                //     `.m-table__wrapper:nth-child(${outcome}) > .m-table > .m-table-row > .m-table-cell > .m-table-header-title`,
+                //     (el) => el.innerHTML
+                // );
                 //check for odds range and place bet
                 if (checkOdds >= 1.02 && checkOdds <= 1.04) {
 
                     //place bet is called
-                       PlaceBet.live(page, 1 /*bet amount*/, activeGame/*active game*/, marketCountItem, k /*offset*/);
+                       PlaceBet.live(page, process.env.BETVALUE /*bet amount*/, activeGame/*active game*/, marketCountItem, k /*offset*/);
 
                     return;
                 }
