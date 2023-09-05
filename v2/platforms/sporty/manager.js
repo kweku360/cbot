@@ -20,6 +20,11 @@ sportyManager.betShoreAll = async (req, res) => {
 };
 
 sportyManager.polaris = async (req, res) => {
+  activate();
+  setInterval(activate,90000,res) 
+};
+
+async function activate(res){
   let browserObject = await startBrowser();
   let page = await browserObject.newPage();
   // Navigate to the selected page
@@ -27,15 +32,20 @@ sportyManager.polaris = async (req, res) => {
 
   //login here
   loginManager.login(page);
+  
   page.waitForTimeout(5000).then(() => {
     Polaris.architect(page);
-    res.send("polaris activated");
-    setInterval(initBetting,90000,page) 
+    console.log("polaris activated")
+    // res.send("polaris activated");
+    setInterval(closeSession,80000,browserObject) 
   });
-};
-
+}
 function initBetting(page){
  page.reload().then(()=>Polaris.architect(page))
 
 }
+async function closeSession(browserObject){
+  await browserObject.close()
+ 
+ }
 module.exports = sportyManager;
