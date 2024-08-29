@@ -5,7 +5,7 @@ let page = null;
 async function startBrowser(){
     let browser;
     try {
-        console.log("Opening the browser......");
+        console.log("Opening benhur the browser......");
         logArchitect.addConsoleItem({"msg":"Opening Browser -----"});
         browser = await puppeteer.launch({
             headless: false,

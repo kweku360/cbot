@@ -1,7 +1,7 @@
 
 
 const State = {}
-//activegame Scheme
+//activegame Schema
 /*
  * {
         id : "",unique joins h-team and away team
@@ -21,6 +21,7 @@ const State = {}
  */
 State.activeGame = [];
 State.bets = []
+State.activeLeague = 1;
 
 State.setState = (state,value)=>{
     State[state] = value;

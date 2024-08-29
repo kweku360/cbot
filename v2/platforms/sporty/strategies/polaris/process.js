@@ -38,7 +38,7 @@ Process.pickGame = async (page) => {
     })
 }
 
-Process.pickVGame = async (page) => {
+Process.pickVGame = async (page) => { 
     //get total live leagues available
     await page.waitForSelector(".m-overview > .match > .m-table");
     const data = await page.evaluate(() => {
@@ -60,12 +60,18 @@ Process.pickVGame = async (page) => {
         }, i);
         //clicks on a particular game
         for (let j = 1; j <= gameCount; j++) {
-            const gameInfo = await pickedGameInfo(page, i, j);
-            State.setState("activeGame", [...State.activeGame, gameInfo]);
+            const gameInfo = await pickedGameInfo(page, i, j+1);
+            //timer checker
+            if (parseInt(gameInfo.currentTime) >= 60) {
+            State.setState("activeGame", [...State.activeGame, gameInfo])
+            }
         }
     }
 
+
     const activeGame = await toActiveGame(page);
+    console.log(activeGame)
+
     page.waitForTimeout(3000).then(async () => {
         const gameInfo = await vGameInfo(page)
         pickMarket(page,gameInfo);
@@ -75,18 +81,16 @@ Process.pickVGame = async (page) => {
 
 const toActiveGame = async (page) => {
     try {
-        //get active game
-        // const activeGame = State.activeGame.find(x => x.active === true);
+        //get a random active game
         const activeGame = State.activeGame[Math.floor(Math.random() * State.activeGame.length)];
-        // console.log(activeGame)
         if (activeGame) {
             await page.waitForSelector(`.m-table:nth-child(${activeGame.meta.position[0]}) > .m-table-row:nth-child(${activeGame.meta.position[1]}) > .m-table-cell > .left-team-table > .teams`)
             await page.click(`.m-table:nth-child(${activeGame.meta.position[0]}) > .m-table-row:nth-child(${activeGame.meta.position[1]}) > .m-table-cell > .left-team-table > .teams`)
         }
         return activeGame
     } catch (e) {
+        console.log("Process.js : ToActiveGame Error")
         console.log(e.toString());
-        // logArchitect.addConsoleItem({"msg":"Multiple bet Click Error","error":e.toString()});
     }
 };
 
@@ -98,9 +102,6 @@ const pickMarket = async (page, activeGame) => {
             const wrapper = Array.from(document.querySelectorAll('.m-detail-wrapper > .m-table__wrapper'))
             return wrapper.length;
         });
-
-        //we do some logging
-        // console.log("total markets  " + marketcount + "\n");
 
         //Loop through marketcount 
         for (var i = 1; i < marketcount; i++) {
@@ -124,15 +125,28 @@ const pickMarket = async (page, activeGame) => {
                         return 0;
                     }
                 }, marketCountItem, k);
+
+                const oddValue = await page.evaluate((marketCountItem, k) => {
+                    const wrapper = document.querySelector(`.m-detail-wrapper > .m-table__wrapper:nth-child(${marketCountItem}) > .m-table:nth-child(2) > .m-outcome > .m-table-cell:nth-child(${k}) > .m-table-cell-item:nth-child(1)`)
+                    if (wrapper != null) {
+                        return wrapper.innerHTML;
+                    } else {
+                        return 0;
+                    }
+                }, marketCountItem, k);
+
+                console.log(oddValue);
+                
                 // const marketName = await page.$eval(
                 //     `.m-table__wrapper:nth-child(${outcome}) > .m-table > .m-table-row > .m-table-cell > .m-table-header-title`,
                 //     (el) => el.innerHTML
                 // );
+
                 //check for odds range and place bet
-                if (checkOdds >= 1.02 && checkOdds <= 1.04) {
+                if (checkOdds >= process.env.MINODD && checkOdds <= process.env.MAXODD) {
 
                     //place bet is called
-                       PlaceBet.live(page, process.env.BETVALUE /*bet amount*/, activeGame/*active game*/, marketCountItem, k /*offset*/);
+                    // PlaceBet.live(page, process.env.BETVALUE /*bet amount*/, activeGame/*active game*/, marketCountItem, k /*offset*/);
 
                     return;
                 }
@@ -140,6 +154,7 @@ const pickMarket = async (page, activeGame) => {
         }
 
     } catch (error) {
+        console.log("Process.js : PickMarket Error")
         console.log(error.toString())
     }
 }
@@ -191,6 +206,7 @@ async function pickedGameInfo(page, currentleague, currentgame) {
         // console.log(gameInfoObj);
         return gameInfoObj;
     } catch (e) {
+        console.log("Process.js : pickedGameInfo Error")
         console.log(e.toString());
     }
 }
@@ -207,7 +223,7 @@ async function vGameInfo(page) {
             (el) => el.innerHTML
         );
         const homeScore = score.trim()[0]
-        const awayScore = score.trim()[score.length-1]
+        const awayScore = score.trim()[score.length - 1]
         const teams = await page.$eval(
             `div > .m-eventDetail > .m-tracker > .m-tracker-title > span`,
             (el) => el.innerHTML
@@ -220,11 +236,12 @@ async function vGameInfo(page) {
             homeTeam,
             awayTeam,
             currentscore: { home: homeScore.trim(), away: awayScore.trim() },
-            currentTime : gameTime.currentTime,
+            currentTime: gameTime.currentTime,
             currentHalf: gameTime.currentHalf,
         };
         return gameInfoObj;
     } catch (e) {
+        console.log("Process.js : vGameInfo Error")
         console.log(e.toString());
     }
 }
@@ -236,8 +253,8 @@ async function vTimerCheck(page) {
     );
     let tVal = matchTime.trim().split("|");
     return {
-        currentHalf : tVal[0],
-        currentTime : parseInt(tVal[1].trim().split(":"),'10')
+        currentHalf: tVal[0],
+        currentTime: parseInt(tVal[1].trim().split(":"), '10')
     }
 }
 async function timerCheck(currentLeaguePick, currentgame, page) {

@@ -3,6 +3,7 @@ var dotenv = require("dotenv");
 dotenv.config();
 
 let page = null;
+let browserInstance;
 
 async function startBrowser() {
   let browser;
@@ -12,7 +13,7 @@ async function startBrowser() {
       browser = await puppeteer.launch({
         headless: false,
         ignoreDefaultArgs: ["--disable-extensions"],
-        args: ["--disable-setuid-sandbox"],
+        args: ["--disable-setuid-sandbox",'--password_manager_enabled=false'],
         ignoreHTTPSErrors: true
       });
     }
@@ -34,18 +35,47 @@ async function startBrowser() {
   return browser;
 }
 
-function setCurrentPage(currpage) {
-  page = currpage;
+
+async function getPuppeteerInstance() {
+  if (!browserInstance) {
+    browserInstance = puppeteer.launch({
+      headless: false,
+      ignoreDefaultArgs: ["--disable-extensions"],
+      args: ["--disable-setuid-sandbox", '--password_manager_enabled=false'],
+      ignoreHTTPSErrors: true
+    });
+  }
+
+  return browserInstance;
 }
 
-function getCurrentPage() {
-  if (page != null) {
-    return page;
+let pageInstance;
+
+async function getPageInstance(browser) {
+  if (!pageInstance) {
+    pageInstance = await browser.newPage();
   }
+
+  const pages = await browser.pages();
+  for (const page of pages) {
+    if (page !== pageInstance) {
+      await page.close();
+    }
+  }
+
+  return pageInstance;
+}
+
+
+function delay(time) {
+  return new Promise(function(resolve) { 
+      setTimeout(resolve, time)
+  });
 }
 
 module.exports = {
   startBrowser,
-  setCurrentPage,
-  getCurrentPage
+  delay,
+  getPuppeteerInstance,
+  getPageInstance
 };

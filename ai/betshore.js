@@ -1,10 +1,12 @@
 var StdResponse = require("../managers/log/stdresponse");
 BetShore = {};
 
-BetShore.run = (req) =>{
-  console.log(req)
+BetShore.run = (req,type="api") =>{
+  // console.log(req)
  let betAmt = req.betamt;
  let lossPercent = req.losspercent;
+ let drawlossPercent = req.drawlosspercent;
+ let middleBetAmtLoss = betAmt - ((drawlossPercent / 100) * betAmt);
  let betAmtLoss = betAmt - ((lossPercent / 100) * betAmt);
  let home = parseFloat(req.home)
  let draw = parseFloat(req.draw)
@@ -13,12 +15,14 @@ BetShore.run = (req) =>{
  let oddsArr = [home,draw,away]
 
  oddsArr.sort((a, b) => a - b);
+//  console.log(oddsArr)
 
  //k is the ant to bet on middle value(market will be determind later)
- let k = betAmtLoss / oddsArr[1] //Math.floor(betAmtLoss / oddsArr[1]); 
+ let k = (middleBetAmtLoss / oddsArr[1]) //Math.floor(betAmtLoss / oddsArr[1]); 
+ 
 
  //l is the ant to bet on highest value(market will be determind later)
- let l = betAmtLoss / oddsArr[2] //Math.floor(betAmtLoss / oddsArr[2]);
+ let l = (betAmtLoss / oddsArr[2]) //Math.floor(betAmtLoss / oddsArr[2]);
 
 
 //j is the ant to bet on lowest value
@@ -31,25 +35,51 @@ BetShore.run = (req) =>{
 
   //n is value of highest bet (least winnable)
   let p = l * oddsArr[2];
+ if(type === "api")
+  {return BetShore.showOutput(m,n,p,j,l,k,req);}
 
-  return BetShore.showOutput(m,n,p,j,k,l);
+  return [j.toFixed(2),k.toFixed(2),l.toFixed(2),m.toFixed(2)];
 }
 
-BetShore.showOutput = (winamt,lsamt,hsamt,winbetamt,lsbetamt,hsbetamt) =>{
+// {
+//   odd: '3.89',
+//   gameIndex: 2,
+//   payload: [ '1.43', '1.09', '0.48', '3.89' ],
+//   homeodd: 2.72,
+//   drawodd: 3.11,
+//   awayodd: 2.76,
+//   leagueId: 4
+// }
+const calculatePad = (winamt,winbetamt,
+  drawbetamt,betAmt,awayodd,homeodd,drawodd,awaybetamt)=>{
+    console.log(drawbetamt,betAmt)
+let expBetAmt = 0.50;
+//calculate drawbet pad
+let drawBetPad = drawbetamt - (betAmt/drawodd);
+let homeBetPad = winbetamt - ((winamt- expBetAmt)/ homeodd)
+let totalBetPad = drawBetPad + homeBetPad + awaybetamt
+console.log(awayodd*totalBetPad,betAmt)
+let betloss = betAmt - (awayodd * totalBetPad)
+
+ return {
+  drawBetPad,
+  homeBetPad,
+  totalBetPad,
+  betloss
+ }
+}
+
+BetShore.showOutput = (winamt,lsamt,hsamt,winbetamt,lsbetamt,hsbetamt,req) =>{
   const outcome = {
-      "win_amount": winamt,
-      "low_shore_amt":lsamt,
-      "high_shore_amt": hsamt,
-      "win_betamt": winbetamt,
-      "low_shore_betamt":lsbetamt,
-      "high_shore_betamt": hsbetamt,
-      "home_odd": "",
-      "away_odd":"",
-      "draw_odd": "",
-      "win_diff": "",
-      "low_shore_diff":"",
-      "high_shore_diff": "",
-      "shore_status":""
+      "win_amount": winamt.toFixed(2),
+      "low_shore_amt":lsamt.toFixed(2),
+      "high_shore_amt": hsamt.toFixed(2),
+      "win_betamt": winbetamt.toFixed(2),
+      "low_shore_betamt":lsbetamt.toFixed(2),
+      "high_shore_betamt": hsbetamt.toFixed(2),
+      "BetPad" : calculatePad(winamt.toFixed(2),winbetamt.toFixed(2),
+      hsbetamt.toFixed(2),req.betamt,req.away
+        ,req.home,req.draw,lsbetamt)
   }
   return StdResponse("true", outcome);
 }

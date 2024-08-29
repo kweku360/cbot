@@ -10,7 +10,7 @@ sportyManager.startBetting = async () => {
     let browserObject = await startBrowser();
     let page = await browserObject.newPage();
     // Navigate to the selected page
-    await page.goto('https://www.sportybet.com/gh/')
+    await page.goto('https://www..com/gh/')
   
     // await page.setViewport({ width: 1920, height: 912 })
     //login here

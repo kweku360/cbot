@@ -10,22 +10,23 @@ PlaceBet = {}
 PlaceBet.live = async (page, betAmt, gameInfo, outcome, outcomechild) => {
     try {
 
-         //sget gameinfo here
+        //sget gameinfo here
         // check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
         console.log("current balance :" + accBal)
-        if (accBal < betAmt) {
+       // if (accBal < betAmt) { correct here
+        if (accBal < 30) { // test spending blocker
             //log
             console.log("insuffiecient funds to make bet")
             logArchitect.addItem({ "Bet Status": `insuffiecient funds to make bet -  ${accBal} Ghs` })
             return;
         }
         //Timerchecker
-        if(parseInt(gameInfo.currentTime) <= 60) {
+        if (parseInt(gameInfo.currentTime) <= 60) {
             console.log("current time restrictions " + gameInfo.currentTime);
             return;
         }
-        
+
         //click on item 
         await page.waitForSelector(`.m-table__wrapper:nth-child(${outcome})
          > .m-table > .m-table-row > .m-table-cell:nth-child(${outcomechild}) > .m-table-cell-item:nth-child(1)`)
@@ -61,9 +62,9 @@ PlaceBet.live = async (page, betAmt, gameInfo, outcome, outcomechild) => {
         }
         )
 
-    } catch (error) {
-        console.log(error);
-        console.log("Unable to Place Bet Now")
+    } catch (e) {
+        console.log("Placebet.js : Placebet.Live Error")
+        console.log(e.toString());
 
         await page.waitForTimeout(5000).then(async () => {
             await page.reload()
@@ -103,49 +104,55 @@ PlaceBet.clearBetSlip = async (page) => {
             await page.click('.m-item > .m-lay-mid > .m-lay-mid > .m-item-play > .m-icon-delete');
             console.log("betslip cleared")
         } catch (e) {
+            console.log("PlaceBet.js : ClearBetSlip Error")
             console.log(e.toString())
         }
     }
 }
 
 PlaceBet.gameInfo = async (page) => {
-    const timer = await page.$eval(`.m-live-wrapper > .virtual-match-tracker > .versus-title > div > .time`,(el)=>el.innerHTML)
+    const timer = await page.$eval(`.m-live-wrapper > .virtual-match-tracker > .versus-title > div > .time`, (el) => el.innerHTML)
     console.log(timer)
 }
 
 PlaceBet.betInfo = async (page, stakeAmt, gameInfo) => {
-    let betInfoObj = {};
-    const market = await page.$eval(
-        `.m-item > .m-lay-mid > .m-lay-mid > .m-item-main > .m-item-market`,
-        (el) => el.innerHTML
-    );
-    const oddPick = await page.$eval(
-        `.m-lay-mid > .m-lay-mid > .m-item-main > .m-item-odds > .m-text-main`,
-        (el) => el.innerHTML
-    );
-    const winAmt = await page.$eval(
-        `.m-stake > div > .m-money-wrapper > div > .m-value`,
-        (el) => el.innerHTML
-    );
-    const name = await page.$eval(
-        `.m-item > .m-lay-mid > .m-lay-mid > .m-item-play > span`,
-        (el) => el.innerHTML
-    );
+    try {
+        let betInfoObj = {};
+        const market = await page.$eval(
+            `.m-item > .m-lay-mid > .m-lay-mid > .m-item-main > .m-item-market`,
+            (el) => el.innerHTML
+        );
+        const oddPick = await page.$eval(
+            `.m-lay-mid > .m-lay-mid > .m-item-main > .m-item-odds > .m-text-main`,
+            (el) => el.innerHTML
+        );
+        const winAmt = await page.$eval(
+            `.m-stake > div > .m-money-wrapper > div > .m-value`,
+            (el) => el.innerHTML
+        );
+        const name = await page.$eval(
+            `.m-item > .m-lay-mid > .m-lay-mid > .m-item-play > span`,
+            (el) => el.innerHTML
+        );
 
-    betInfoObj = {
-        id: market.replace(/\s+/g, ''),//shd be the game id if we get it
-        name: name.trim(),
-        market: market.trim(),
-        oddPick: oddPick.trim(),
-        stakeAmt,
-        winAmt: winAmt.trim(),
-        result: "pending",
-        betStatus: "running",
-        gameInfo,
-        dateCreated: Date.now()
+        betInfoObj = {
+            id: market.replace(/\s+/g, ''),//shd be the game id if we get it
+            name: name.trim(),
+            market: market.trim(),
+            oddPick: oddPick.trim(),
+            stakeAmt,
+            winAmt: winAmt.trim(),
+            result: "pending",
+            betStatus: "running",
+            gameInfo,
+            dateCreated: Date.now()
+        }
+        console.log("current bet")
+        console.log(betInfoObj);
+    } catch (e) {
+        console.log("PlaceBet.js : betInfo Error")
+        console.log(e.toString())
     }
-    console.log("current bet")
-    console.log(betInfoObj);
 }
 
 

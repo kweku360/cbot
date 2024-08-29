@@ -27,5 +27,11 @@ router.post("/live/revbetshore", aiResource.revBetShore);
 // ChanceBot v2 routes {/v2/{strategy}/action}
 router.get("/v2/betshore/all", sportyManager.betShoreAll);
 router.get("/v2/polaris/start", sportyManager.polaris);
+router.get("/v2/benhur/start", sportyManager.benhur);
+router.get("/v2/benhur/logs", loggingResource.benHurLogs);
+// vfootball 
+router.get("/v2/arsenal/start", sportyManager.arsenal);
+//scheduled soccer betting  (QuoVadis)
+router.get("/v2/quovadis/start", sportyManager.quoVadis);
 
 module.exports = router;
