@@ -22,8 +22,10 @@ async function activateQuoVadis(res) {
   
     // Navigate to the selected page
     await page.goto("https://www.sportybet.com/gh/");
+    console.log("quovd activated");
     //login here
     loginManager.loginMobile(page);
+    console.log("we dey try login");
     delay(5000).then(() => {
       Quovadis.architect(page);
       if (!res.headersSent) {

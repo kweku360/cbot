@@ -12,6 +12,7 @@ const betArr = [];
 QuoVadis.architect = async (page) => {
   try{
   await delay(500).then(async () => {
+    console.log("Architect - lets get going")
     ThreeLine.start(page);
   })
 
