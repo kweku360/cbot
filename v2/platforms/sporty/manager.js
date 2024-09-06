@@ -10,7 +10,7 @@ var sportyManager = {};
 
 sportyManager.quoVadis = async (req, res) => {
   activateQuoVadis(res);
-  setInterval(activateQuoVadis, 60000, res);
+  setInterval(activateQuoVadis, 120000, res);
 };
 
 async function activateQuoVadis(res) {

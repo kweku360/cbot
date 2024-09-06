@@ -47,6 +47,7 @@ async function getPuppeteerInstance() {
 
     if (process.env.ENVIRONMENT === "production") {
       browserInstance = puppeteer.launch({
+        protocolTimeout: 60000,
         headless: true,
         ignoreDefaultArgs: ["--disable-extensions"],
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
