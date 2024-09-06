@@ -16,7 +16,7 @@ PageApi.find = async (selector, page, options = {}) => {
       timeout,
     });
   } catch (error) { 
-    // console.error(`Error waiting for selector "${selector}":`, error);
+    console.error(`Error waiting for selector "${selector}":`, error);
    // console.log(`TimeOut waiting for selector "${selector}":`);
   }
 };
@@ -33,7 +33,7 @@ PageApi.click = async (selector, page, options = {}) => {
   try {
     await page.click(value, {timeout,});
   } catch (error) {
-   // console.log(`Timeout clicking on "${selector}":`);
+   console.log(`Timeout clicking on "${selector}":`);
     // console.error(`Timeout clicking on "${selector}":`, error);
   }
 };
@@ -54,7 +54,7 @@ PageApi.findArrayCount = async (selector, page, options = {}) => {
     }, value);
     return count;
   } catch (error) {
-      //console.log(`Unable to get count for "${selector}":`,error);
+      console.log(`Unable to get count for "${selector}":`,error);
     // console.error(`Error waiting for selector "${selector}":`, error);
   }
 };
@@ -73,7 +73,7 @@ PageApi.getText = async (selector, page, options = {}) => {
     return val;
   } catch (error) {
     // console.error(`Error waiting for selector "${selector}":`, error);
-   console.log(`TimeOut Getting text for "${selector}":`,error);
+   console.log(`TimeOut Getting text for "${selector}":`);
   }
 };
 
