@@ -11,14 +11,15 @@ const Threeline = {};
 
 Threeline.start = async (page) => {
   try {
-    const checkBalance = await checkAccountBalance(page);
-    if (checkBalance) {
-      await closeSportyAds(page);
-      await toViewAllLiveGames(page);
-      await pickLiveGame(page);
-    } else {
-      console.log("Balance threshold reached.");
-    }
+    await closeSportyAds(page);
+    await toViewAllLiveGames(page);
+    await pickLiveGame(page);
+    // const checkBalance = await checkAccountBalance(page);
+    // if (checkBalance) {
+
+    // } else {
+    //   console.log("Balance threshold reached.");
+    // }
   } catch (error) {
     console.log(error);
   }
