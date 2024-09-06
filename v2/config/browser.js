@@ -39,7 +39,7 @@ async function startBrowser() {
 async function getPuppeteerInstance() {
   if (!browserInstance) {
     browserInstance = puppeteer.launch({
-      headless: false,
+      headless: true,
       ignoreDefaultArgs: ["--disable-extensions"],
       args: ["--disable-setuid-sandbox", '--password_manager_enabled=false'],
       ignoreHTTPSErrors: true

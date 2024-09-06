@@ -1,6 +1,8 @@
+const QuovadisDb = require("../db/index");
+const { generateUniqueId } = require("../utils/uuid");
+const { getCurrentDate } = require("../utils/date");
 
-
-const State = {}
+const State = {};
 //activegame Schema
 /*
  * {
@@ -21,16 +23,16 @@ const State = {}
  */
 State.activeGames = []; //refers to list to games with bets placed.
 State.pickedGame = []; //refers to a game selected for bet.. bets can be placed or rejected.
-State.pickedErrorGame = []
-State.bets = []
+State.pickedErrorGame = [];
+State.bets = [];
 State.activeLeague = 1;
 
-State.setState = (state,value)=>{
-    State[state] = value;
-}
-State.getState = (state)=>{
-    return State[state];
-}
+State.setState = (state, value) => {
+  State[state] = value;
+};
+State.getState = (state) => {
+  return State[state];
+};
 
 module.exports = State;
 
