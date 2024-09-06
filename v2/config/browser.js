@@ -9,25 +9,24 @@ async function startBrowser() {
   let browser;
   try {
     console.log("Opening the browser......");
-    if(process.env.ENVIRONMENT === "development") {
+    if (process.env.ENVIRONMENT === "development") {
       browser = await puppeteer.launch({
         headless: false,
         ignoreDefaultArgs: ["--disable-extensions"],
-        args: ["--disable-setuid-sandbox",'--password_manager_enabled=false'],
-        ignoreHTTPSErrors: true
+        args: ["--disable-setuid-sandbox", "--password_manager_enabled=false"],
+        ignoreHTTPSErrors: true,
       });
     }
 
-    if(process.env.ENVIRONMENT === "production") {
+    if (process.env.ENVIRONMENT === "production") {
       browser = await puppeteer.launch({
         headless: true,
-        executablePath: '/usr/bin/chromium-browser',
+        executablePath: "/usr/bin/chromium-browser",
         ignoreDefaultArgs: ["--disable-extensions"],
-        args: ["--no-sandbox","--disable-setuid-sandbox"],
-        ignoreHTTPSErrors: true
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        ignoreHTTPSErrors: true,
       });
     }
-
   } catch (err) {
     console.log("Could not create a browser instance => : ", err);
   }
@@ -35,15 +34,25 @@ async function startBrowser() {
   return browser;
 }
 
-
 async function getPuppeteerInstance() {
   if (!browserInstance) {
-    browserInstance = puppeteer.launch({
-      headless: true,
-      ignoreDefaultArgs: ["--disable-extensions"],
-      args: ["--disable-setuid-sandbox", '--password_manager_enabled=false'],
-      ignoreHTTPSErrors: true
-    });
+    if (process.env.ENVIRONMENT === "development") {
+      browserInstance = puppeteer.launch({
+        headless: true,
+        ignoreDefaultArgs: ["--disable-extensions"],
+        args: ["--disable-setuid-sandbox", "--password_manager_enabled=false"],
+        ignoreHTTPSErrors: true,
+      });
+    }
+
+    if (process.env.ENVIRONMENT === "production") {
+      browserInstance = puppeteer.launch({
+        headless: true,
+        ignoreDefaultArgs: ["--disable-extensions"],
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        ignoreHTTPSErrors: true,
+      });
+    }
   }
 
   return browserInstance;
@@ -66,10 +75,9 @@ async function getPageInstance(browser) {
   return pageInstance;
 }
 
-
 function delay(time) {
-  return new Promise(function(resolve) { 
-      setTimeout(resolve, time)
+  return new Promise(function (resolve) {
+    setTimeout(resolve, time);
   });
 }
 
@@ -77,5 +85,5 @@ module.exports = {
   startBrowser,
   delay,
   getPuppeteerInstance,
-  getPageInstance
+  getPageInstance,
 };
