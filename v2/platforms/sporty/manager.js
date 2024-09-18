@@ -22,10 +22,7 @@ async function activateQuoVadis(res) {
   
     // Navigate to the selected page
     await page.goto("https://www.sportybet.com/gh/");
-    console.log("quovd activated");
-    //login here
     loginManager.loginMobile(page);
-    console.log("we dey try login");
     delay(5000).then(() => {
       Quovadis.architect(page);
       if (!res.headersSent) {
@@ -60,22 +57,18 @@ sportyManager.polaris = async (req, res) => {
 };
 
 sportyManager.benhur = async (req, res) => {
-  let browserObject = await startBrowser();
-  let page = await browserObject.newPage();
-  const iPhone = puppeteer.devices["iPhone 6"];
+  let browserObject = await getPuppeteerInstance();
+  let page = await getPageInstance(browserObject);
+  const iPhone = puppeteer.KnownDevices["iPhone 12"];
   await page.emulate(iPhone);
-  //login here
-  // loginManager.login(page);
 
+  // await page.goto("https://www.sportybet.com/gh/m/instant-virtuals");
+  await page.goto("https://www.sportybet.com/gh/");
+  await delay(1000);
+  loginManager.loginMobile(page);
+  await delay(2000);
   await page.goto("https://www.sportybet.com/gh/m/instant-virtuals");
-  // await page.waitForTimeout(3000)
-  loginManager.instantVirtualLogin(page);
-  // page.waitForTimeout(5000).then(async () =>  {
-  //   await page.reload();
-
-  // });
-
-  page.waitForTimeout(5000).then(() => {
+  delay(5000).then(() => {
     Benhur.architect(page);
     console.log("BenHur activated");
     res.send("Benhur activated");

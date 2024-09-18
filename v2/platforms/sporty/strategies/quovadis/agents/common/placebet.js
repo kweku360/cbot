@@ -5,7 +5,6 @@ const QuovadisDb = require("../../db/index");
 const { generateUniqueId } = require("../../utils/uuid");
 
 const placeBet = async (page, pickedGame) => {
-    console.log("placing bet");
     //close unnnecesary popups
     await PageApi.delay(1000);
     await PageApi.find("sportyPopUps", page);
@@ -25,7 +24,7 @@ const placeBet = async (page, pickedGame) => {
     await PageApi.find("clearDefaultBetvalue", page);
     await PageApi.click("clearDefaultBetvalue", page);
   
-    let amount = .5 + "";
+    let amount = 5 + "";
     if (amount[amount.length - 1] === "0" && amount.includes(".")) {
       let str = amount.split("");
       str[amount.length - 1] = "1";

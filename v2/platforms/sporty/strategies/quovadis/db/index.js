@@ -6,26 +6,26 @@ const userpass = "angusd3i";
 const QuovadisDb = {};
 
 QuovadisDb.StoreDocument = async (doc) => {
-  db.insert(doc, "foobar", function (error, foo) {
-    if(err) {
-      return console.log("I failed");
-    }
-    db.insert({foo: "bar", "_rev": foo.rev}, "foobar", 
-    function (error, response) {
-      if(!error) {
-        console.log("it worked");
-      } else {
-        console.log("sad panda");
-      }
-    });
-  });
+  // db.insert(doc, "foobar", function (error, foo) {
+  //   if(err) {
+  //     return console.log("I failed");
+  //   }
+  //   db.insert({foo: "bar", "_rev": foo.rev}, "foobar", 
+  //   function (error, response) {
+  //     if(!error) {
+  //       console.log("it worked");
+  //     } else {
+  //       console.log("sad panda");
+  //     }
+  //   });
+  // });
 }; 
 
 QuovadisDb.saveDocument = async (doc) => {
     try {
       const db = nano.db.use("cbot");
       const document = await db.insert(doc);
-      console.log(document);
+      // console.log(document);
       return document;
     } catch (error) {
        console.log("Unable to save ",error);
@@ -37,7 +37,7 @@ QuovadisDb.saveDocument = async (doc) => {
       // Attempt to fetch the document
       const db = nano.db.use("cbot");
       const doc = await db.get(docId);
-      console.log(doc)
+      // console.log(doc)
       return doc; // Document exists, return it
     } catch (err) {
       if (err.error === 'not_found') {

@@ -64,7 +64,6 @@ loginManager.loginMobile = async (page) => {
   
     await page.waitForSelector('.register-and-login > #loginStep > .login-container > form > .af-button')
     await page.click('.register-and-login > #loginStep > .login-container > form > .af-button') 
-  console.log("bro we logg in ooo")
    } catch (error) {
     console.log("Login.login mobile Error - already logged in")
   }

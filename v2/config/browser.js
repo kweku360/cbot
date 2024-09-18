@@ -20,7 +20,7 @@ async function startBrowser() {
 
     if (process.env.ENVIRONMENT === "production") {
       browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         executablePath: "/usr/bin/chromium-browser",
         ignoreDefaultArgs: ["--disable-extensions"],
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -38,16 +38,16 @@ async function getPuppeteerInstance() {
   if (!browserInstance) {
     if (process.env.ENVIRONMENT === "development") {
       browserInstance = puppeteer.launch({
-        headless: true,
+        headless: false,
         ignoreDefaultArgs: ["--disable-extensions"],
         args: ["--disable-setuid-sandbox", "--password_manager_enabled=false"],
         ignoreHTTPSErrors: true,
       });
-    }
+    }  
 
     if (process.env.ENVIRONMENT === "production") {
       browserInstance = puppeteer.launch({
-        protocolTimeout: 60000,
+        protocolTimeout: 60000,  
         headless: true,
         ignoreDefaultArgs: ["--disable-extensions"],
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -58,7 +58,7 @@ async function getPuppeteerInstance() {
 
   return browserInstance;
 }
-
+ 
 let pageInstance;
 
 async function getPageInstance(browser) {

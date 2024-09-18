@@ -5,6 +5,7 @@ const livebetting = require("../app/http/betmanager");
 const loggingResource = require("../app/http/logmanager");
 const aiResource = require("../app/http/aimanager");
 const sportyManager = require("../v2/platforms/sporty/manager");
+const aviatorManager = require("../v2/platforms/sporty/aviator/manager");
 
 /* Test Browser */
 // router.get("/", login.tester);
@@ -34,4 +35,6 @@ router.get("/v2/arsenal/start", sportyManager.arsenal);
 //scheduled soccer betting  (QuoVadis)
 router.get("/v2/quovadis/start", sportyManager.quoVadis);
 
+// the aviator
+router.get("/v2/aviator/start", aviatorManager.aviate);
 module.exports = router;

@@ -1,37 +1,41 @@
 var State = require("../../../../state");
 var PlaceBet = require("./placebet");
 var betShore = require("../../../../../ai/betshore");
+const PageApi = require("./facade/pageapi");
 
 const Process = {}
 Process.pickGameUtd = async (page) => {
     try {
 
+        await PageApi.find("closeSwipeAd", page);
+        await PageApi.click("closeSwipeAd", page);
+
         let gameInfo = {}
         for (let i = 2; i <= 11; i++) {
-            const homeTeam = await page.$eval(
-                `.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
-            .m-table-row > .m-table-cell > span:nth-child(2)`,
-                (el) => el.innerHTML
-            );
-            const awayTeam = await page.$eval(
-                `.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
-            .m-table-row > .m-table-cell > span:nth-child(4)`,
-                (el) => el.innerHTML
-            );
+            console.log(i)
+            const homeTeam = await PageApi.getText("homeTeam", page, {
+        replacementArr: [i],
+      });
+            const awayTeam =  await PageApi.getText("awayTeam", page, {
+                replacementArr: [i],
+              });
+              const betableTeams = ["CHE","FOR","FUL","LEI","NEW","SOU",
+                "BRE","CRY","EVE","WOL","BHA","AST","WHU","BOU","IPS"]
+
             // if (homeTeam === "MCI" || awayTeam === "ARS" || awayTeam === "MUN") {
-            if (awayTeam === "MUN") {
-                gameInfo["home"] = homeTeam
-                gameInfo["away"] = awayTeam
-                await page.waitForSelector(`.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
-             .m-table-row > .m-table-cell > span:nth-child(2)`)
-                await page.click(`.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
-             .m-table-row > .m-table-cell > span:nth-child(2)`)
-                break
-            }
+            // if (awayTeam === "MUN") {
+            //     gameInfo["home"] = homeTeam
+            //     gameInfo["away"] = awayTeam  
+            //     await page.waitForSelector(`.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
+            //  .m-table-row > .m-table-cell > span:nth-child(2)`)
+            //     await page.click(`.m-table:nth-child(1) > .event-list:nth-child(${i}) > 
+            //  .m-table-row > .m-table-cell > span:nth-child(2)`)
+            //     break
+            // }
         }
 
 
-        await page.waitForTimeout(3000);
+        await PageApi.delay(3000);
         const data = await page.evaluate(() => {
             const wrapper = Array.from(
                 document.querySelectorAll("div.market")
@@ -73,24 +77,24 @@ Process.pickGameUtd = async (page) => {
         // click to expand
         await page.waitForSelector('#insta-win > #quick-game-container > #quick-bet-container > .fast-mul-betslip > .flex')
         await page.click('#insta-win > #quick-game-container > #quick-bet-container > .fast-mul-betslip > .flex')
-        await page.waitForTimeout(2000);
+        await PageApi.delay(3000);
 
         // const betAr = [3,4,5]
 
-        const bAmt = [3, 3, 1.5]
+        const bAmt = [.3, .3, .5]
 
         for (let i = 1; i <= 3; i++) {
-            await page.waitForTimeout(500);
+            await PageApi.delay(500);
             // click and add amount
             await page.waitForSelector(`.betslip-option:nth-child(${i}) > .betslip-option_right > .option-content > .stake-input-wrapper > .stake-input > div > .m-input-keyboard-wrapper > .m-input-wrapper > .m-keybord-input`)
 
             await page.click(`.betslip-option:nth-child(${i}) > .betslip-option_right > .option-content > .stake-input-wrapper > .stake-input > div > .m-input-keyboard-wrapper > .m-input-wrapper > .m-keybord-input`)
-            await page.waitForTimeout(500);
+            await PageApi.delay(500);
             // //delete value
             await page.waitForSelector(`.betslip-option:nth-child(${i}) > .betslip-option_right:nth-child(2) > .option-content:nth-child(2) > .stake-input-wrapper:nth-child(2) > .stake-input:nth-child(1) .m-input-keyboard-wrapper:nth-child(1) > .m-keyboard:nth-child(2) > .flexpad-wrap:nth-child(1) .m-keyboard-row:nth-child(1) > .m-keyboard-key:nth-child(7)`)
             await page.click(`.betslip-option:nth-child(${i}) > .betslip-option_right:nth-child(2) > .option-content:nth-child(2) > .stake-input-wrapper:nth-child(2) > .stake-input:nth-child(1) .m-input-keyboard-wrapper:nth-child(1) > .m-keyboard:nth-child(2) > .flexpad-wrap:nth-child(1) .m-keyboard-row:nth-child(1) > .m-keyboard-key:nth-child(7)`)
 
-            await page.waitForTimeout(500);
+            await PageApi.delay(500);
 
             let amount = bAmt[i - 1] + "";
             if (amount[amount.length - 1] === "0" && amount.includes(".")) {
@@ -101,7 +105,7 @@ Process.pickGameUtd = async (page) => {
 
             for (let ch of amount) {
                 ch = ch == "." ? "d" : parseInt(ch, 10)
-                await page.waitForTimeout(500);
+                await PageApi.delay(500);
                 if (ch !== 0 && ch <= 6) {
                     await page.waitForSelector((`.betslip-option:nth-child(${i}) > .betslip-option_right:nth-child(2) > .option-content:nth-child(2) > .stake-input-wrapper:nth-child(2) > .stake-input:nth-child(1) .m-input-keyboard-wrapper:nth-child(1) > .m-keyboard:nth-child(2) > .flexpad-wrap:nth-child(1) .m-keyboard-row:nth-child(1) > .m-keyboard-key:nth-child(${ch})`))
                     await page.click((`.betslip-option:nth-child(${i}) > .betslip-option_right:nth-child(2) > .option-content:nth-child(2) > .stake-input-wrapper:nth-child(2) > .stake-input:nth-child(1) .m-input-keyboard-wrapper:nth-child(1) > .m-keyboard:nth-child(2) > .flexpad-wrap:nth-child(1) .m-keyboard-row:nth-child(1) > .m-keyboard-key:nth-child(${ch})`))
@@ -116,10 +120,10 @@ Process.pickGameUtd = async (page) => {
                 }
             }
             // click done
-            await page.waitForTimeout(500);
+            await PageApi.delay(500);
             await page.waitForSelector(`.betslip-option:nth-child(${i}) > .betslip-option_right > .option-content > .stake-input-wrapper > .stake-input > div > .m-input-keyboard-wrapper > .m-input-wrapper`)
             await page.click(`.betslip-option:nth-child(${i}) > .betslip-option_right > .option-content > .stake-input-wrapper > .stake-input > div > .m-input-keyboard-wrapper > .m-input-wrapper`)
-            await page.waitForTimeout(500);
+            await PageApi.delay(500);
         }
         //check total stake
         const totalStake = await page.$eval(
@@ -131,27 +135,27 @@ Process.pickGameUtd = async (page) => {
          await page.waitForSelector('#quick-game-container > #betslip-backdrop > #betslip-container > #bet-btn > p:nth-child(2)')
          await page.click('#quick-game-container > #betslip-backdrop > #betslip-container > #bet-btn > p:nth-child(2)')
  
-         await page.waitForTimeout(1000);
+         await PageApi.delay(1000);
  
          // //click confirm
          await page.waitForSelector('#confirm-btn')
          await page.click('#confirm-btn')
  
-         await page.waitForTimeout(2000);
+         await PageApi.delay(2000);
  
  
          //run bet
-         await page.waitForTimeout(3000);
+         await PageApi.delay(3000);
          await page.waitForSelector('#open-bets-container > .btn-nav-bottom > .nav-bottom-right > span > span')
          await page.click('#open-bets-container > .btn-nav-bottom > .nav-bottom-right > span > span')
  
-         await page.waitForTimeout(3000);
+         await PageApi.delay(3000);
  
          //skip to result
          await page.waitForSelector('#insta-win > #iv-live-score > #iv-live-score-running > .bottom > span')
          await page.click('#insta-win > #iv-live-score > #iv-live-score-running > .bottom > span')
  
-         await page.waitForTimeout(5000);
+         await PageApi.delay(5000);
 
         //check for success / or loss
         const result = await page.$eval(
@@ -170,22 +174,22 @@ Process.pickGameUtd = async (page) => {
         await page.click('.btn-nav-bottom > .nav-bottom-right > span > .btn-right > .total-win')
 
         //repeat
-        await page.waitForTimeout(5000);
+        await PageApi.delay(5000);
 
         Process.pickGameUtd(page);
 
     } catch (e) {
-        console.log('Error - ' + e.message + ` Reloading`)
+        console.error(e)
         //reload page
         await page.reload();
-        await page.waitForTimeout(3000);
+        await PageApi.delay(3000);
         //click on next round or (todo) open bets
         await page.waitForSelector('#quick-game-matche-container > .btn-nav-bottom > .nav-bottom-left > .action-button-sub-container > span')
         await page.click('#quick-game-matche-container > .btn-nav-bottom > .nav-bottom-left > .action-button-sub-container > span')
         console.log("next round clicked")
         //restart
-        await page.waitForTimeout(3000);
-        Process.pickGameUtd(page);
+        await PageApi.delay(3000);
+        Process.pickGameUtd(page);  
     }
 }
 Process.pickGame = async (page) => {

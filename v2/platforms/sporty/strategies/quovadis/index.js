@@ -11,11 +11,10 @@ var QuoVadis = {};
 const betArr = [];
 QuoVadis.architect = async (page) => {
   try{
-  await delay(500).then(async () => {
-    console.log("Architect - lets get going")
+  await delay(500).then(async () => { 
     ThreeLine.start(page);
   })
-
+  
 }catch(e){
   console.log("index.js : QuoVadis.Architect Error");
   console.log(e.toString());

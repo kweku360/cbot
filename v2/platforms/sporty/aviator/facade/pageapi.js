@@ -8,7 +8,7 @@ PageApi.find = async (selector, page, options = {}) => {
   if (options.replacementArr) {
     value = SelectorApi.getSelectorWithVariables(
       selector,
-      options.replacementArr
+      options.replacementArr  
     );
   }
   try {

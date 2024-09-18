@@ -11,20 +11,14 @@ const Threeline = {};
 
 Threeline.start = async (page) => {
   try {
-    console.log("closing sporty ads")
-    await closeSportyAds(page);
-    console.log("Sporty ads closed")
-    console.log("view all live games")
-    await toViewAllLiveGames(page);
-    console.log("pick live game")
-    await pickLiveGame(page);
-    console.log("finish live games")
-    // const checkBalance = await checkAccountBalance(page);
-    // if (checkBalance) {
-
-    // } else {
-    //   console.log("Balance threshold reached.");
-    // }
+    const checkBalance = await checkAccountBalance(page);
+    if (checkBalance) {
+      await closeSportyAds(page);
+      await toViewAllLiveGames(page);
+      await pickLiveGame(page);
+    } else {
+      console.log("Balance threshold reached.");
+    }
   } catch (error) {
     console.log(error);
   }
@@ -41,13 +35,11 @@ const closeSportyAds = async (page) => {
 };
 
 const clearPreviousBets = async (page) => {
-  console.log("Clearing All previous bets");
   // await PageApi.find("sportyPopUps", page);
   // await PageApi.click("sportyPopUps", page);
   await PageApi.find("closeFastbetSlip", page);
   await PageApi.click("closeFastbetSlip", page);
   const betCount = await PageApi.getText("expandCurrentBet", page);
-  console.log(betCount);
   if (parseInt(betCount) > 0) {
     await PageApi.find("expandCurrentBet", page);
     await PageApi.click("expandCurrentBet", page);
@@ -108,7 +100,7 @@ const gameBuilder = async (page, currentleague, currentgame) => {
     );
     const id = generateUniqueId(gameInfoObj["id"]);
     const gameDoc = await QuovadisDb.getDocument(id);
-    console.log("isErrorPick",isErrorPick)
+    // console.log("isErrorPick",isErrorPick)
     if (gameDoc === false && isErrorPick === undefined) {
       State.setState("pickedGame", gameInfoObj);
       return true;
@@ -198,8 +190,8 @@ const pickMarket = async (page, pickedGame) => {
 
 const checkAccountBalance = async (page) => {
   const amt = await PageApi.getText("accountBalanceAmount", page);
-  console.log(amt);
-  if (parseInt(amt.trim(), 10) < 5) {
+  // console.log(amt);
+  if (parseInt(amt.trim(), 10) < 8) {
     return false;
   }
   return true;

@@ -6,9 +6,10 @@ var BenHur = {};
 const betArr = [];
 BenHur.architect = async (page) => {
   try{
-  await page.waitForTimeout(5000).then(async () => {
-    Process.pickGameUtd(page);
-  })
+  // await page.waitForTimeout(5000).then(async () => {
+  //   Process.pickGameUtd(page);
+  // })
+  await Process.pickGameUtd(page);
   // await page.waitForTimeout(5000).then(async () => {
   //   Process.pickVGame(page)
   // })
