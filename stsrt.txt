@@ -1,0 +1,2 @@
+pm2 start npm --name "aviator sporty"  run dev
+pm2 start npm --name "my-dev-process" --watch --env .env.development run dev
