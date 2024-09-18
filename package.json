@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "server": "dotenv -e .env.sporty && node ./bin/www"
   },
   "dependencies": {
     "bookshelf": "^1.2.0",

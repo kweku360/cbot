@@ -16,7 +16,7 @@ async function activate(res) {
     let page = await getPageInstance(browserObject);
     const iPhone = puppeteer.KnownDevices["iPhone 12"];
     await page.emulate(iPhone);
-
+    console.log("starting browser")
     // Navigate to the selected page
     await page.goto("https://www.sportybet.com/gh/");
     
@@ -26,7 +26,7 @@ async function activate(res) {
     delay(5000).then(() => {
       AviatorOne.architect(page);
       if (!res.headersSent) {
-        res.send('Aviator online');
+        res.send('Aviator online');  
       }
     });
   } catch (error) {

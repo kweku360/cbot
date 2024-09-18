@@ -38,7 +38,7 @@ AviatorOne.architect = async (page) => {
     }
     console.log("count : ",roundArr.length);
     console.log(roundArr[0]);
-    if(roundArr[1] <= 1.11){
+    if(roundArr[0] <= 1.41){
        await stake(page,frame)
     }else{
         await delay(5000)
@@ -48,10 +48,10 @@ AviatorOne.architect = async (page) => {
      } catch (e) {
     console.log("index.js : AviatorOne.Architect Error");
     console.log(e.toString());
-    await delay(50000);
+    await delay(50000); 
     AviatorOne.architect(page);
-  }
-};
+  }  
+};    
 
 const stake =async (page,frame) =>{
     //get previousBetAmt
@@ -120,10 +120,10 @@ const stake =async (page,frame) =>{
       ".cashout-spinner > .ng-valid > .spinner > .input > input"
     );
     await cashOutValue.click({ clickCount: 3 });
-    await cashOutValue.type("1.30");
-    await delay(500);
-    const cashOutConfirm = await frame.waitForSelector(
-      ".cash-out-switcher > label"
+    await cashOutValue.type("1.40");
+    await delay(500); 
+    const cashOutConfirm = await frame.waitForSelector(    
+      ".cash-out-switcher > label" 
     );
     await cashOutConfirm.click();
 
