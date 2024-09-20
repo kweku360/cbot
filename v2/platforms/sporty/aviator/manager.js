@@ -18,10 +18,12 @@ async function activate(res) {
     await page.emulate(iPhone);
     console.log("starting browser")
     // Navigate to the selected page
+    //const recorder = await page.screencast({path: 'recording.webm'});
     await page.goto("https://www.sportybet.com/gh/");
-    
-    loginManager.loginMobile(page);
+   // console.log("site opend")
+    await loginManager.loginMobile(page);
     await delay(2000) 
+  //  await recorder.stop();
     await page.goto("https://www.sportybet.com/gh/sportygames/lobby");
     delay(5000).then(() => {
       AviatorOne.architect(page);
@@ -36,3 +38,4 @@ async function activate(res) {
 }
 
 module.exports = aviatorManager;
+

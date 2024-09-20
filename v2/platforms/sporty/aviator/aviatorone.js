@@ -1,5 +1,6 @@
 var PageApi = require("./facade/pageapi");
 var { delay } = require("../../../config/browser");
+const errors = require("bookshelf/lib/errors");
 
 var AviatorOne = {};
 let cashOutSwitch = 0;
@@ -38,7 +39,8 @@ AviatorOne.architect = async (page) => {
     }
     console.log("count : ",roundArr.length);
     console.log(roundArr[0]);
-    if(roundArr[0] <= 1.41){
+     
+    if(roundArr[0] <= 1.81){
        await stake(page,frame)
     }else{
         await delay(5000)
@@ -46,7 +48,7 @@ AviatorOne.architect = async (page) => {
     }
    
      } catch (e) {
-    console.log("index.js : AviatorOne.Architect Error");
+    console.error("index.js : AviatorOne.Architect Error",errors);
     console.log(e.toString());
     await delay(50000); 
     AviatorOne.architect(page);
@@ -96,17 +98,17 @@ const stake =async (page,frame) =>{
     if(amtSet === 0){
         await betAmt.click({ clickCount: 2 });
         await delay(500);
-        await betAmt.type("0.1");
+        await betAmt.type("2");
 
-        amtSet = 1;
-    }
+        amtSet = 1;  
+    }      
     await delay(500);
     const betAmtConfirm = await frame.waitForSelector(
       ".cash-out-switcher > label"
     );  
     await betAmtConfirm.click();
     await delay(500);
-    if (cashOutSwitch === 0) {
+    if (cashOutSwitch === 0) { 
       // await delay(240000)
       const autoCashOut = await frame.waitForSelector(
         ".cash-out-switcher > .ng-valid > .input-switch"
@@ -120,10 +122,10 @@ const stake =async (page,frame) =>{
       ".cashout-spinner > .ng-valid > .spinner > .input > input"
     );
     await cashOutValue.click({ clickCount: 3 });
-    await cashOutValue.type("1.40");
+    await cashOutValue.type("1.70");
     await delay(500); 
     const cashOutConfirm = await frame.waitForSelector(    
-      ".cash-out-switcher > label" 
+      ".cash-out-switcher > label"   
     );
     await cashOutConfirm.click();
 
@@ -137,9 +139,9 @@ const stake =async (page,frame) =>{
     //     document.querySelector(".auto-game-feature > .bet-block > .spinner > .big > .input > input").value = "1.5";
     // });
     // console.log(tt);
-    await delay(30000);
-    AviatorOne.architect(page);
-
+    await delay(35000);
+    AviatorOne.architect(page);   
+     
 }
 
 const calculateRegression = (data) => {

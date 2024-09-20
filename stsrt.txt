@@ -1,2 +1,7 @@
 pm2 start npm --name "aviator sporty"  run dev
 pm2 start npm --name "my-dev-process" --watch --env .env.development run dev
+
+
+//Libraries to install on ubuntu for chrome puppeteer
+sudo apt-get install libgtk-3-dev
+

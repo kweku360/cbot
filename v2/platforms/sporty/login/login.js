@@ -12,7 +12,7 @@ loginManager.login = async (page) => {
   );
   await page.type(
     ".m-login-bar > .m-opt > .m-phone-wrapper > .m-phone > input",
-    `0543499645`
+    `0207598163`
   );
 
   await page.waitForSelector(
@@ -47,6 +47,10 @@ loginManager.instantVirtualLogin = async (page) => {
 
 loginManager.loginMobile = async (page) => {
   try {
+    const recorder = await page.screencast({path: 'recording.webm'});
+    await page.waitForSelector(".m-region-list > .active")
+    await page.click(".m-region-list > .active")
+  
     await page.waitForSelector('.mobile-navbar > .navbar-wraper > .mobile-navbar-right > .m-login-not > .m-btn-login')
     await page.click('.mobile-navbar > .navbar-wraper > .mobile-navbar-right > .m-login-not > .m-btn-login')
   
@@ -64,8 +68,10 @@ loginManager.loginMobile = async (page) => {
   
     await page.waitForSelector('.register-and-login > #loginStep > .login-container > form > .af-button')
     await page.click('.register-and-login > #loginStep > .login-container > form > .af-button') 
+    await recorder.stop();
    } catch (error) {
-    console.log("Login.login mobile Error - already logged in")
+    
+    console.error("login Error",error)
   }
 
 }
