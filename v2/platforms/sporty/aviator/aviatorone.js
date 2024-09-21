@@ -38,13 +38,14 @@ AviatorOne.architect = async (page) => {
     }
     console.log("count : ",roundArr.length);
     console.log(roundArr[0]);
-    if(roundArr[0] <= 1.41){
-       await stake(page,frame)
-    }else{
-        await delay(5000)
-        AviatorOne.architect(page);
-    }
-   
+    await stake(page,frame)
+    // if(roundArr[0] <= 1.41){
+    //    await stake(page,frame)
+    // }else{
+    //     await delay(5000)
+    //     AviatorOne.architect(page);
+    // }
+      
      } catch (e) {
     console.log("index.js : AviatorOne.Architect Error");
     console.log(e.toString());
@@ -96,16 +97,18 @@ const stake =async (page,frame) =>{
     if(amtSet === 0){
         await betAmt.click({ clickCount: 2 });
         await delay(500);
-        await betAmt.type("0.1");
+        await page.keyboard.press('Backspace');
+        await delay(500);
+        await betAmt.type("1.1");
 
-        amtSet = 1;
+        amtSet = 1;   
     }
     await delay(500);
     const betAmtConfirm = await frame.waitForSelector(
-      ".cash-out-switcher > label"
+      ".cash-out-switcher > label" 
     );  
     await betAmtConfirm.click();
-    await delay(500);
+    await delay(500);  
     if (cashOutSwitch === 0) {
       // await delay(240000)
       const autoCashOut = await frame.waitForSelector(
