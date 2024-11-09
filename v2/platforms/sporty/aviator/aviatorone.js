@@ -95,8 +95,8 @@ AviatorOne.architect = async (page) => {
             status:outcomeStatus, //win /loss
             initialBalance:currentBalance,
             currentBalance:getBalance,
-            profitlossamt:outcomeStatus == "WIN" ? Math.floor((getBalance - currentBalance)):
-            Math.floor((currentBalance - getBalance)),
+            profitlossamt:outcomeStatus == "WIN" ? Math.ceil((getBalance - currentBalance)):
+            Math.ceil((currentBalance - getBalance)),
             stakeOdd:"1.1",
             outcomeOdd:roundArr[0]
           }]

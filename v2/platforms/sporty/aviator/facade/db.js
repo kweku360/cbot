@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
-const sequelize = new Sequelize("cbotdb", "kweku", "", {
-  host: "localhost",
+const sequelize = new Sequelize("cbotdb", "postgres", "one1mic", {
+  host: "167.172.26.8",
   dialect: "postgres",
   logging: false, // Set to true to log SQL queries
 });
@@ -32,14 +32,22 @@ const Logs = sequelize.define(
 
 DbApi = {};
 
-DbApi.test = async () => {
+DbApi.test = async (req,res) => {
   try {
     await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+    res.send("Connection has been established successfully")
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    res.send("Error" + error.toString())
   }
 };
+DbApi.init = async (req,res) => {
+    try {  
+        await Logs.sync({ force: true });
+        res.send("Sync Successful")
+    } catch (error) {
+        res.send("unable to sync",error)
+    }
+  };
 
 DbApi.addLog = async (logObj) => {
   try {
