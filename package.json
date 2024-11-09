@@ -21,8 +21,11 @@
     "morgan": "~1.9.1",
     "mysql": "^2.16.0",
     "nano": "^8.2.3",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
     "pug": "^3.0.0",
-    "puppeteer": "^23.3.0"
+    "puppeteer": "^23.3.0",
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.4",
