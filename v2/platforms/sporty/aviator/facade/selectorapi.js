@@ -22,6 +22,12 @@ const selectors = [
     id: "a-03",
     selector: ".navigation-switcher > ng-star-inserted:nth-child(3)",
   },
+  //parimatch login
+  {
+    name: "toLogin",
+    id: "p-01",
+    selector: "#header-layout > .header__wrapper > .header__user-nav > #loginButton > i18n-t",
+  },
 
 
 ];

@@ -17,7 +17,7 @@ PageApi.find = async (selector, page, options = {}) => {
     });
   } catch (error) { 
     // console.error(`Error waiting for selector "${selector}":`, error);
-   // console.log(`TimeOut waiting for selector "${selector}":`);
+    console.log(`TimeOut waiting for selector "${selector}":`);
   }
 };
 
@@ -33,7 +33,7 @@ PageApi.click = async (selector, page, options = {}) => {
   try {
     await page.click(value, {timeout,});
   } catch (error) {
-  //  console.log(`Timeout clicking on "${selector}":`);
+    console.log(`Timeout clicking on "${selector}":`);
     // console.error(`Timeout clicking on "${selector}":`, error);
   }
 };

@@ -40,10 +40,10 @@ async function getPuppeteerInstance() {
       browserInstance = puppeteer.launch({
         headless: false,
         ignoreDefaultArgs: ["--disable-extensions"],
-        args: ["--disable-setuid-sandbox", "--password_manager_enabled=false"],
+        args: ["--disable-setuid-sandbox","--disable-notifications", "--password_manager_enabled=false"],
         ignoreHTTPSErrors: true,
       });
-    }  
+    }   
 
     if (process.env.ENVIRONMENT === "production") {
       browserInstance = puppeteer.launch({

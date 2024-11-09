@@ -6,6 +6,7 @@ const loggingResource = require("../app/http/logmanager");
 const aiResource = require("../app/http/aimanager");
 const sportyManager = require("../v2/platforms/sporty/manager");
 const aviatorManager = require("../v2/platforms/sporty/aviator/manager");
+const aviatorLogs = require("../v2/platforms/sporty/aviator/facade/db");
 
 /* Test Browser */
 // router.get("/", login.tester);
@@ -37,4 +38,14 @@ router.get("/v2/quovadis/start", sportyManager.quoVadis);
 
 // the aviator
 router.get("/v2/aviator/start", aviatorManager.aviate);
+
+
+// aviator logs
+router.get("/v2/aviator/logs/test", aviatorLogs.test);
+router.get("/v2/aviator/logs/init", aviatorLogs.init);
+router.get("/v2/aviator/logs/current", aviatorLogs.currentDay);
+router.get("/v2/aviator/logs/daily/:date", aviatorLogs.getByDay);
+
+
+
 module.exports = router;
