@@ -1,10 +1,17 @@
 const { Sequelize, DataTypes } = require("sequelize");
-
-const sequelize = new Sequelize("cbotdb", "postgres", "one1mic", {
-  host: "167.172.26.8",
-  dialect: "postgres",
-  logging: false, // Set to true to log SQL queries
-});
+var { envBuilder } = require("../../../../config/browser");
+//online
+// const sequelize = new Sequelize("cbotdb", "postgres", "one1mic", {
+//   host: "167.172.26.8",
+//   dialect: "postgres",
+//   logging: false, // Set to true to log SQL queries
+// });
+//local
+const sequelize = new Sequelize("cbotdb", "kweku", "", {
+    host: "localhost",
+    dialect: "postgres",
+    logging: false, // Set to true to log SQL queries
+  });
 
 //define Logs model
 const Logs = sequelize.define(
@@ -83,7 +90,8 @@ DbApi.addLog = async (logObj) => {
 //Logs
 DbApi.currentDay = async (req,res) => {
   try {
-    const currentLog = await Logs.findByPk(generateId());
+
+    const currentLog = await Logs.findByPk(generateId(req));
     if (currentLog === null) {
       res.json({status:"Log not found"})
     } else {
@@ -97,7 +105,7 @@ DbApi.currentDay = async (req,res) => {
 DbApi.getByDay = async (req,res) => {
     try {
       const date  = req.params.date
-      const currentLog = await Logs.findByPk(generateId(date));
+      const currentLog = await Logs.findByPk(generateId(req,date));
       if (currentLog === null) {
         res.json({status:"Log not found"})
       } else {
@@ -108,13 +116,13 @@ DbApi.getByDay = async (req,res) => {
     }
   };
 
-const generateId = (date="") => {
+const generateId = (req,date="") => {
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
   const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   const yy = String(today.getFullYear()).slice(-2);
   const formattedToday = date == "" ? dd + mm + yy : date;
-  const id = formattedToday + process.env.PLATFORM + process.env.ACCNUMBER;
+  const id = `${formattedToday}${envBuilder(req.headers['x-port'],"PLATFORM")}${envBuilder(req.headers['x-port'],"ACCNUMBER")}`;
   return id;
 };
 

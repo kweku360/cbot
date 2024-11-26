@@ -33,7 +33,24 @@ async function startBrowser() {
 
   return browser;
 }
-
+function checkInstance(){
+  if(browserInstance){
+    return true;
+  }else{
+    return false;
+  }
+}
+async function closeInstance(){
+  if(browserInstance){
+  await pageInstance.close()
+  let browserObject = await getPuppeteerInstance();
+  await browserObject.close();
+  browserInstance = null;
+    return
+  }else{
+    return
+  }
+}
 async function getPuppeteerInstance() {
   if (!browserInstance) {
     if (process.env.ENVIRONMENT === "development") {
@@ -53,7 +70,7 @@ async function getPuppeteerInstance() {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         ignoreHTTPSErrors: true,
       });
-    }
+    }  
   }
 
   return browserInstance;
@@ -82,9 +99,17 @@ function delay(time) {
   });
 }
 
+function envBuilder(port,value){
+  const v= `${value}_${port}`
+  console.log(v)
+  return process.env[v];
+}
 module.exports = {
+  envBuilder,
   startBrowser,
   delay,
+  checkInstance,
+  closeInstance,
   getPuppeteerInstance,
   getPageInstance,
 };

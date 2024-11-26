@@ -1,4 +1,8 @@
 var PageApi = require("../aviator/facade/pageapi");
+var {
+  envBuilder,
+  delay
+} = require("../../../config/browser");
 var dotenv = require("dotenv");
 
 dotenv.config();
@@ -67,7 +71,7 @@ loginManager.instantVirtualLogin = async (page) => {
   );
 };
 
-loginManager.loginMobile = async (page) => {
+loginManager.loginMobile = async (req,page) => {
   try {
     //const recorder = await page.screencast({path: 'recording.webm'});
     // await page.waitForSelector(".m-region-list > .active")
@@ -95,12 +99,12 @@ loginManager.loginMobile = async (page) => {
     );
     await page.type(
       "#loginStep > .login-container > form > .m-input-wap-group > .m-input-wap",
-      `${process.env.SPORTYACC}`
+      `${envBuilder(req.headers['x-port'],"ACC")}`
     );
 
     await page.waitForSelector("input[type=password]");
     await page.click("input[type=password]");
-    await page.type("input[type=password]", `${process.env.SPORTYPASS}`);
+    await page.type("input[type=password]", `${envBuilder(req.headers['x-port'],"PASS")}`);
 
     await page.waitForSelector(
       ".register-and-login > #loginStep > .login-container > form > .af-button"
@@ -114,9 +118,8 @@ loginManager.loginMobile = async (page) => {
   }
 };
 
-loginManager.loginBetway = async (page) => {
+loginManager.loginBetway = async (req,page) => {
   try {
-    await delay(3000);
     await page.waitForSelector("#close-toast");
     await page.click("#close-toast");
     // await delay(2000);
@@ -132,11 +135,11 @@ loginManager.loginBetway = async (page) => {
     await delay(2000);
     await page.waitForSelector("#login-mobile");
     await page.click("#login-mobile");
-    await page.type("#login-mobile", `0543499645`);
+    await page.type("#login-mobile", `${envBuilder(req.headers['x-port'],"ACC")}`);
     await delay(2000);
     await page.waitForSelector("#login-password");
     await page.click("#login-password");
-    await page.type("#login-password", `Swampus3`);
+    await page.type("#login-password", `${envBuilder(req.headers['x-port'],"PASS")}`);
     await delay(2000);
     await page.waitForSelector('form > .w-full > .p-button > .flex > span')
     await page.click('form > .w-full > .p-button > .flex > span')
@@ -145,7 +148,7 @@ loginManager.loginBetway = async (page) => {
   }
 };
 
-loginManager.loginParimatch = async (page) => {
+loginManager.loginParimatch = async (req,page) => {
   try {
     await delay(1000);
     await PageApi.find("toLogin", page);
@@ -153,12 +156,13 @@ loginManager.loginParimatch = async (page) => {
     await delay(1000);
     await page.waitForSelector('#login-form-phone')
     await page.click('#login-form-phone')
-    await page.type('#login-form-phone',`207598163`)
+    await page.type('#login-form-phone',`${envBuilder(req.headers['x-port'],"ACC")}`)
     await delay(1000);
 
     await page.waitForSelector('#login-form-password')
     await page.click('#login-form-password')
-    await page.type('#login-form-password',`Swampus3`)
+    await page.type('#login-form-password',`${envBuilder(req.headers['x-port'],"PASS")}`)
+    // await page.type('#login-form-password',`Swampus3`)
     await delay(2000);
     await page.waitForSelector('#log-in-button')
     await page.click('#log-in-button')
@@ -168,7 +172,7 @@ loginManager.loginParimatch = async (page) => {
   }
 };
 
-loginManager.loginBet22 = async (page) => {
+loginManager.loginBet22 = async (req,page) => {
   try {
     await delay(1000);
     await PageApi.find("toLogin", page);
@@ -176,12 +180,12 @@ loginManager.loginBet22 = async (page) => {
     await delay(1000);
     await page.waitForSelector('#login-form-phone')
     await page.click('#login-form-phone')
-    await page.type('#login-form-phone',`207598163`)
+    await page.type('#login-form-phone',`${envBuilder(req.headers['x-port'],"ACC")}`)
     await delay(1000);
 
     await page.waitForSelector('#login-form-password')
     await page.click('#login-form-password')
-    await page.type('#login-form-password',`Swampus3`)
+    await page.type('#login-form-password',`${envBuilder(req.headers['x-port'],"PASS")}`)
     await delay(2000);
     await page.waitForSelector('#log-in-button')
     await page.click('#log-in-button')
@@ -191,11 +195,11 @@ loginManager.loginBet22 = async (page) => {
   }
 };
 
-function delay(time) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, time);
-  });
-}
+// function delay(time) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, time);
+//   });
+// }
 
 module.exports = loginManager;
 // ${process.env.ACCOUNT_PASS}

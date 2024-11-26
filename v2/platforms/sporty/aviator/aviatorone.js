@@ -1,25 +1,15 @@
 var PageApi = require("./facade/pageapi");
-var { delay, getPuppeteerInstance } = require("../../../config/browser");
+var { delay, getPuppeteerInstance,envBuilder } = require("../../../config/browser");
 const errors = require("bookshelf/lib/errors");
 const logApi = require("./facade/db");
 var dotenv = require("dotenv");
 
 var AviatorOne = {};
 let cashOutSwitch = 0;
-let prevBet = 0;
-let totalProfitLoss = 0;
-let gameCount = 0;
 let amtSet = 0;
-AviatorOne.architect = async (page) => {
+AviatorOne.architect = async (req,page) => {
   try {
-    await delay(4000);
-    //click on aviator
-    await PageApi.find("clickAviator", page);
-    await PageApi.click("clickAviator", page);
-    await delay(500);
-    await PageApi.find("clickAviatorNext", page);
-    await PageApi.click("clickAviatorNext", page);
-    await delay(5000);
+
     //lets get the iframe
     const frameHandle = await page.$("iframe");
     const frame = await frameHandle.contentFrame();
@@ -36,7 +26,7 @@ AviatorOne.architect = async (page) => {
     let balanceFlag = false;
     let currentBalance = 0;
     let killCount = 0;
-    let killLimit = 10;
+    let killLimit = 20;
     let outcomeStatus = ""
     let initialBalance = await frame.$eval(".amount", (el) => el.innerHTML);
     initialBalance = parseFloat(initialBalance.trim());
@@ -46,7 +36,7 @@ AviatorOne.architect = async (page) => {
         const wrapper = Array.from(
           document.querySelectorAll(".payouts-block > .payouts")
         );
-        return wrapper.length;
+        return wrapper.length;   
       });
 
       if (roundCount !== previousRoundCount) {
@@ -58,8 +48,8 @@ AviatorOne.architect = async (page) => {
           roundHistory = parseFloat(roundHistory.slice(0, -1));
           roundArr.push(roundHistory);
         }
-        // console.log("Round count changed to:", roundCount);
-        // console.log("The new Value is", roundArr[0]);
+        console.log("Round count changed to:", roundCount);
+        console.log("The new Value is", roundArr[0]);
         previousRoundCount = roundCount;
 
         //display balance
@@ -75,17 +65,9 @@ AviatorOne.architect = async (page) => {
             return;
           }
           if (getBalance < currentBalance) {
-            // console.log("loss made - sorry");
-            // console.log("initial balance - ", currentBalance);
-            // console.log("Loss balance - ", getBalance);
-            // console.log("-----------------------");
             outcomeStatus = "LOSS"
           }
           if (getBalance > currentBalance) {
-            // console.log("WIN WIN WIN");
-            // console.log("initial balance - ", currentBalance);
-            // console.log("Win balance - ", getBalance);
-            // console.log("-----------------------");
             outcomeStatus = "WIN"
           }
           //lets log outcome
@@ -101,10 +83,10 @@ AviatorOne.architect = async (page) => {
             outcomeOdd:roundArr[0]
           }]
           await logApi.addLog({
-            id: generateId(),
-            platform: process.env.PLATFORM,
-            number: process.env.ACCNUMBER,
-            date:new Date().toISOString(),
+            id: generateId(req),
+            platform: `${envBuilder(req.headers['x-port'],"PLATFORM")}`,
+            number: `${envBuilder(req.headers['x-port'],"ACCNUMBER")}`,
+            date:new Date().toISOString().slice(0,10),
             data: roundLog,
           });
 
@@ -112,12 +94,6 @@ AviatorOne.architect = async (page) => {
           if (killCount === killLimit) {
             //calculate exitbalance
             const exitBalance = getBalance - initialBalance;
-            // console.log("-----------------------");
-            // console.log("Starting Balance  - ", initialBalance);
-            // console.log("Closing Balance  - ", getBalance);
-            // console.log("Difference - ", exitBalance);
-            // console.log("-----------------------");
-            //close browser
             let browserObject = await getPuppeteerInstance();
             await browserObject.close();
           }
@@ -128,8 +104,9 @@ AviatorOne.architect = async (page) => {
         }
 
         flyCount++;
-        if (flyCount === 3) {
-          const stakeOutcome = await stake(page, frame);
+        console.log(parseInt(`${envBuilder(req.headers['x-port'],"FLYVALUE")}`));
+        if (flyCount === parseInt(`${envBuilder(req.headers['x-port'],"FLYVALUE")}`)) {
+          const stakeOutcome = await stake(req,page, frame);
           if (stakeOutcome === true) {
             let curbalance = await frame.$eval(".amount", (el) => el.innerHTML);
             curbalance = parseFloat(curbalance.trim());
@@ -144,12 +121,14 @@ AviatorOne.architect = async (page) => {
   } catch (e) {
     console.error("index.js : AviatorOne.Architect Error", errors);
     console.log(e.toString());
-    await delay(2000);
-    AviatorOne.architect(page);
+    await delay(4000)
+    process.exit();
+   // await delay(2000);
+   // AviatorOne.architect(page);
   }
 };
 
-const stake = async (page, frame) => {
+const stake = async (req,page, frame) => {
   //get previousBetAmt
   let currentBetAmt = await frame.$eval(".amount", (el) => el.innerHTML);
   currentBetAmt = parseFloat(currentBetAmt.trim());
@@ -205,11 +184,6 @@ const stake = async (page, frame) => {
     ".auto-game-feature > .buttons-block > button"
   );
   await placeBet.click();
-  // console.log("-----------------");
-  // console.log("bet placed");
-  // console.log("-----------------");
-  // await delay(10000);
-  // AviatorOne.architect(page);
   return true;
 };
 
@@ -251,13 +225,13 @@ const checkVolatility = (array, n, threshold, x) => {
   }
 };
 
-const generateId = () => {
+const generateId = (req) => {
   const today = new Date();
   const dd = String(today.getDate()).padStart(2, "0");
   const mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
   const yy = String(today.getFullYear()).slice(-2);
   const formattedToday = dd + mm + yy;
-  const id = formattedToday+process.env.PLATFORM+process.env.ACCNUMBER
+  const id = `${formattedToday}${envBuilder(req.headers['x-port'],"PLATFORM")}${envBuilder(req.headers['x-port'],"ACCNUMBER")}`
   return id
 };
 
