@@ -74,6 +74,7 @@ PageApi.getText = async (selector, page, options = {}) => {
   } catch (error) {
     // console.error(`Error waiting for selector "${selector}":`, error);
   //  console.log(`TimeOut Getting text for "${selector}":`);
+  return null;
   }
 };
 

@@ -1,5 +1,5 @@
 const PageApi = require("../../facade/pageapi");
-const { getCurrentTimeStamp } = require("../../utils/date")
+const { getCurrentTimeStamp } = require("../../utils/date");
 
 const buildGameInfo = async (page, currentleague, currentgame) => {
   let gameInfo = {};
@@ -46,4 +46,34 @@ const buildGameInfo = async (page, currentleague, currentgame) => {
 
   return gameInfo;
 };
-module.exports = buildGameInfo;
+const buildGameInfoPreMatch = async (page, currentleague, currentgame) => {
+  try {
+    let gameInfo = {};
+    const homeTeam = await PageApi.getText("hTeam", page, {
+      replacementArr: [currentleague, currentgame],
+    });
+
+    const awayTeam = await PageApi.getText("aTeam", page, {
+      replacementArr: [currentleague, currentgame],
+    });
+
+    const leagueName = await PageApi.getText("lName", page, {
+      replacementArr: [currentleague],
+    });
+
+    gameInfo = {
+      leagueName,
+      id: (homeTeam + "_" + awayTeam).replace(/\s+/g, ""),
+      hometeam: homeTeam.trim(),
+      awayteam: awayTeam.trim(),
+      timestamp: Date.now(),
+      position: [currentleague, currentgame],
+      prisonCount: 0,
+    };
+
+    return gameInfo;
+  } catch (e) {
+    return {id:"NoItem"};
+  }
+};
+module.exports = { buildGameInfo, buildGameInfoPreMatch };

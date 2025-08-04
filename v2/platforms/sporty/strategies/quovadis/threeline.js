@@ -1,14 +1,11 @@
 const { gameInfo } = require("../../polaris/placebet");
-var { delay, getPuppeteerInstance } = require("../../../../../config/browser");
+var { delay } = require("../../../../../config/browser");
 var State = require("./index");
 const PageApi = require("../facade/pageapi");
 const QuovadisDb = require("../db/index");
 const { generateUniqueId } = require("../utils/uuid");
 const placeBet = require("../agents/common/placebet");
-const {
-  buildGameInfo,
-  buildGameInfoPreMatch,
-} = require("../agents/common/gamebuilder");
+const buildGameInfo = require("../agents/common/gamebuilder");
 
 const Threeline = {};
 
@@ -17,27 +14,8 @@ Threeline.start = async (page) => {
     const checkBalance = await checkAccountBalance(page);
     if (checkBalance) {
       await closeSportyAds(page);
-      await toNext3Hours(page);
-      //find out if the current game has already been processed.
-      for (let i = 2; i < 10; i++) {
-        await PageApi.delay(2000);
-        const gameInfo = await buildGameInfoPreMatch(page, i, 1);
-        const gameDoc = await QuovadisDb.getDocument(gameInfo["id"]);
-        if (gameDoc === false) {
-          console.log("game Identified Placing Bet", gameInfo);
-          if (gameInfo.id !== "NoItem") {
-            await PageApi.delay(2000);
-            await PageApi.find("gameClick", page, {
-              replacementArr: [i],
-            });
-            await PageApi.click("gameClick", page, {
-              replacementArr: [i],
-            });
-            await processStart(page, gameInfo);
-            return;
-          }
-        }
-      }
+      await toViewAllLiveGames(page);
+      await pickLiveGame(page);
     } else {
       console.log("Balance threshold reached.");
     }
@@ -46,62 +24,10 @@ Threeline.start = async (page) => {
   }
 };
 
-const toNext3Hours = async (page) => {
-  console.log("toNext3Hours: navigating to next 3 hours of games...");
-  await PageApi.find("next3Hours", page);
-  await PageApi.click("next3Hours", page);
-};
-
-const processStart = async (page, gameInfo) => {
-  try {
-    //todo add logic
-    await delay(1000);
-    await PageApi.find("winningMargin", page);
-    await PageApi.click("winningMargin", page);
-
-    //check for winning margin and save for error val
-    const winningMargin = await PageApi.getText("winningMargin", page);
-    if (winningMargin === null || winningMargin !== "Winning Margin") {
-      //store in db and return
-      console.log("winning margin market not found");
-      const doc = {
-        _id: gameInfo["id"],
-        data: gameInfo,
-      };
-      await QuovadisDb.saveDocument(doc);
-      retun;
-    }
-    await PageApi.delay(2000);
-
-    //click on first 3
-    for (let i = 1; i <= 1; i++) {
-      await page.waitForSelector(
-        `div:nth-child(1) > .m-market > .m-table > .m-table-row:nth-child(1) > .m-table-cell:nth-child(${i}) > em:nth-child(1)`
-      );
-      await page.click(
-        `div:nth-child(1) > .m-market > .m-table > .m-table-row:nth-child(1) > .m-table-cell:nth-child(${i}) > em:nth-child(1)`
-      );
-    }
-    //click on bottom 3
-    for (let i = 1; i <= 1; i++) {
-      await delay(1000);
-      await page.waitForSelector(
-        `div > .m-market > .m-table > .m-table-row:nth-child(2) > .m-outcome-three:nth-child(${i})`
-      );
-      await page.click(
-        `div > .m-market > .m-table > .m-table-row:nth-child(2) > .m-outcome-three:nth-child(${i})`
-      );
-    }
-    //click to expand betslip
-    await page.waitForSelector("#fast-mul-betslip");
-    await page.click("#fast-mul-betslip");
-
-    const bAmt = [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2];
-
-    await placeBet(page, gameInfo);
-  } catch (error) {
-    console.log(error);
-  }
+const toViewAllLiveGames = async (page) => {
+  console.log("toViewAllLiveGames: navigating to all live games...");
+  await PageApi.find("allLiveGames", page);
+  await PageApi.click("allLiveGames", page);
 };
 
 const closeSportyAds = async (page) => {
@@ -183,7 +109,7 @@ const gameBuilder = async (page, currentleague, currentgame) => {
       return true;
     } else {
     }
-  }
+  }    
   return false;
 };
 
@@ -268,7 +194,7 @@ const pickMarket = async (page, pickedGame) => {
 const checkAccountBalance = async (page) => {
   const amt = await PageApi.getText("accountBalanceAmount", page);
   console.log(amt);
-  if (parseInt(amt.trim(), 10) < 0.1) {
+  if (parseInt(amt.trim(), 10) < 1) {
     return false;
   }
   return true;

@@ -10,8 +10,8 @@ const Process = {};
 Process.start = async (page) => {
     try {
         //navigate to 3 hour interval
-        navigate.toThreeHourInterval(page);
-        await page.waitForTimeout(3000);
+     //   navigate.toThreeHourInterval(page);
+     //   await page.waitForTimeout(3000);
 
         //click on first game  - todo this will be changed testing
         await page.waitForSelector('div:nth-child(3) > .m-event-sport > .m-table-row > .m-table-cell > .team:nth-child(1)')

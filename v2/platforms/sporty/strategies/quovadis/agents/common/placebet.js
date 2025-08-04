@@ -3,28 +3,29 @@ var State = require("../index");
 const PageApi = require("../../facade/pageapi");
 const QuovadisDb = require("../../db/index");
 const { generateUniqueId } = require("../../utils/uuid");
+const { getPuppeteerInstance } = require("../../../../../../config/browser");
 
 const placeBet = async (page, pickedGame) => {
     //close unnnecesary popups
-    await PageApi.delay(1000);
+    await PageApi.delay(500);
     await PageApi.find("sportyPopUps", page);
     await PageApi.click("sportyPopUps", page);
-    await PageApi.delay(1000);
+    await PageApi.delay(500);
   
     await PageApi.find("closeFastbetSlip", page);
     await PageApi.click("closeFastbetSlip", page); 
   
-    await PageApi.delay(1000);
+    await PageApi.delay(500);
     await PageApi.find("expandCurrentBet", page);
     await PageApi.click("expandCurrentBet", page);
-    await PageApi.delay(1000);
+    await PageApi.delay(500);
     await PageApi.find("openVirtualKeyboard", page);
     await PageApi.click("openVirtualKeyboard", page);
-    await PageApi.delay(1000);
+    await PageApi.delay(500);
     await PageApi.find("clearDefaultBetvalue", page);
     await PageApi.click("clearDefaultBetvalue", page);
   
-    let amount = 5 + "";
+    let amount = 0.2 + "";
     if (amount[amount.length - 1] === "0" && amount.includes(".")) {
       let str = amount.split("");
       str[amount.length - 1] = "1";
@@ -70,11 +71,12 @@ const placeBet = async (page, pickedGame) => {
     await PageApi.click("finishBet", page);
   
     const doc = {
-        _id : generateUniqueId(pickedGame["id"]),
+        _id : pickedGame["id"],
         data:pickedGame
       }
       await QuovadisDb.saveDocument(doc);
       State.setState("pickedGame", []);
+      
   };
-
+   
   module.exports = placeBet;

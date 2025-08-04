@@ -70,8 +70,8 @@ async function getPuppeteerInstance() {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         ignoreHTTPSErrors: true,
       });
-    }  
-  }
+    }     
+  }        
 
   return browserInstance;
 }

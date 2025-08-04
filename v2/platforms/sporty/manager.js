@@ -9,11 +9,11 @@ var Quovadis = require("./strategies/quovadis");
 var sportyManager = {};
 
 sportyManager.quoVadis = async (req, res) => {
-  activateQuoVadis(res);
-  setInterval(activateQuoVadis, 120000, res);
+  activateQuoVadis(req,res);
+  setInterval(activateQuoVadis, 120000, req,res);
 };
 
-async function activateQuoVadis(res) {
+async function activateQuoVadis(req,res) {
   try {
     let browserObject = await getPuppeteerInstance();
     let page = await getPageInstance(browserObject);
@@ -22,7 +22,7 @@ async function activateQuoVadis(res) {
   
     // Navigate to the selected page
     await page.goto("https://www.sportybet.com/gh/");
-    loginManager.loginMobile(page);
+    loginManager.loginMobile(req,page);
     delay(5000).then(() => {
       Quovadis.architect(page);
       if (!res.headersSent) {

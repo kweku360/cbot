@@ -5,7 +5,7 @@ const selectors = [
     name: "closeSportyAd",
     id: "s-01",
     selector:
-      ".m-act-pop > .es-dialog-body > .es-dialog-main > .m-act-wrapper > .m-icon-close",
+      "div.close-btn",
   },
   {
     name: "allLiveGames",
@@ -183,7 +183,46 @@ const selectors = [
     id: "s-33",
     selector:  ".mobile-navbar-right > .m-login-yes > .m-btn-deposit > .avatar-box > span:nth-child(3)"
   },
-
+  //football in the nexr 3 hours section selector
+  {
+    name: "next3Hours",
+    id: "s-34",
+    selector:  "div.m-popular li:nth-of-type(3) img"
+  },
+  //click on a game place a bet
+  {
+    name: "gameClick",
+    id: "s-35",
+    selector:  "div:nth-child(une-1) > .m-event-sport > .m-table-row > .m-table-cell > .team:nth-child(1)"
+  },
+  //select the winning margin odd
+  {
+    name: "winningMargin",
+    id: "s-36",
+    selector:  "div.m-sport-market > div:nth-of-type(1) span.text"
+  },
+  //select home win by 1
+  {
+    name: "homeWinByOne",  
+    id: "s-37",
+    selector:  "div:nth-child(1) > .m-market > .m-table > .m-table-row:nth-child(1) > .m-table-cell:nth-child(1) > em:nth-child(1)"
+  },
+  //this is for scheduled games
+  {
+    name: "hTeam",
+    id: "s-8",
+    selector: `div.m-table > div:nth-of-type(une-1) div.m-info-cell > div:nth-of-type(1)`,
+  },
+  {
+    name: "aTeam", 
+    id: "s-8",
+    selector: `div.m-table > div:nth-of-type(une-1) div.m-info-cell > div:nth-of-type(2)`,
+  },
+  {
+    name: "lName",  
+    id: "s-8",
+    selector: 'div.m-table > div:nth-of-type(une-1) span.m-league-name',
+  },
 
 
 
