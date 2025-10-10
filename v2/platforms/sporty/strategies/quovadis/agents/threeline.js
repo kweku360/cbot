@@ -69,7 +69,7 @@ const processStart = async (page, gameInfo) => {
         data: gameInfo,
       };
       await QuovadisDb.saveDocument(doc);
-      retun;
+      return;
     }
     await PageApi.delay(2000);
 

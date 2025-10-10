@@ -9,10 +9,29 @@ const buildGameInfo = require("../agents/common/gamebuilder");
 
 const Threeline = {};
 
+const handleInitialPopups = async (page) => {
+  try {
+    // Handle sporty ads popup
+    await PageApi.find("closeSportyAd", page);
+    await PageApi.click("closeSportyAd", page);
+    
+    // Handle guide button popup
+    await PageApi.find("sportyPopUps", page);
+    await PageApi.click("sportyPopUps", page);
+    
+    // Clear any popup backgrounds
+    await PageApi.find("clearPopupBg", page);
+    await PageApi.click("clearPopupBg", page);
+  } catch (error) {
+    console.log("Error handling popups:", error);
+  }
+};
+
 Threeline.start = async (page) => {
   try {
     const checkBalance = await checkAccountBalance(page);
     if (checkBalance) {
+      // await handleInitialPopups(page);
       await closeSportyAds(page);
       await toViewAllLiveGames(page);
       await pickLiveGame(page);

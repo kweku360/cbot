@@ -10,6 +10,9 @@ PlaceBet = {}
 PlaceBet.live = async (page, betAmt, gameInfo, outcome, outcomechild) => {
     try {
 
+        // Clear betslip first
+        await PlaceBet.clearBetSlip(page);
+
         //sget gameinfo here
         // check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
@@ -93,22 +96,26 @@ PlaceBet.validateBetOdd = async (page, currentOdd) => {
 
 //Clear betslip befor placing a new one.
 PlaceBet.clearBetSlip = async (page) => {
-    await page.waitForSelector('.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count')
-    const betslip = await page.evaluate(() => {
-        const wrapper = document.querySelector(`.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count`)
-        return wrapper.innerHTML;
-    });
-    if (betslip != "") {
-        try {
-            await page.waitForSelector('.m-item > .m-lay-mid > .m-lay-mid > .m-item-play > .m-icon-delete')
-            await page.click('.m-item > .m-lay-mid > .m-lay-mid > .m-item-play > .m-icon-delete');
-            console.log("betslip cleared")
-        } catch (e) {
-            console.log("PlaceBet.js : ClearBetSlip Error")
-            console.log(e.toString())
-        }
+    try {
+        // Click expand current bet to see total bets
+        await page.waitForSelector(".m-main-mid > .m-bottom-nav > .betslip-float-wrapper > .count-wrapper > .count", { timeout: 3000 })
+            .then(async (element) => {
+                const betCount = await element.evaluate(el => el.textContent);
+                if (parseInt(betCount) > 0) {
+                    await page.click(".m-main-mid > .m-bottom-nav > .betslip-float-wrapper > .count-wrapper > .count");
+                    await page.waitForSelector(".m-betslip-header > .head-container > .wrapper > .remove-all", { timeout: 2000 });
+                    await page.click(".m-betslip-header > .head-container > .wrapper > .remove-all");
+                    await page.waitForSelector(".es-dialog-wrap > .es-dialog > .m-dialog-footer > a.es-dialog-btn:nth-child(2)", { timeout: 2000 });
+                    await page.click(".es-dialog-wrap > .es-dialog > .m-dialog-footer > a.es-dialog-btn:nth-child(2)");
+                }
+            })
+            .catch(() => {
+                console.log("No existing bets found");
+            });
+    } catch (error) {
+        console.log("Error clearing betslip:", error);
     }
-}
+};
 
 PlaceBet.gameInfo = async (page) => {
     const timer = await page.$eval(`.m-live-wrapper > .virtual-match-tracker > .versus-title > div > .time`, (el) => el.innerHTML)

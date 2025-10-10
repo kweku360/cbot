@@ -77,6 +77,7 @@ loginManager.loginMobile = async (req,page) => {
     // await page.waitForSelector(".m-region-list > .active")
     // await page.click(".m-region-list > .active")
 
+
     await page.waitForSelector(
       ".mobile-navbar > .navbar-wraper > .mobile-navbar-right > .m-login-not > .m-btn-login"
     );
@@ -112,9 +113,51 @@ loginManager.loginMobile = async (req,page) => {
     await page.click(
       ".register-and-login > #loginStep > .login-container > form > .af-button"
     );
-    //await recorder.stop();
+
   } catch (error) {
-   // console.log("Login", error);
+    console.error("Login Error:");
+  }
+};
+
+const handlePopups = async (page) => {
+  try {
+    // Handle guide button popup
+    await page.waitForSelector('[data-op*="close_guide_button"]', { timeout: 3000 })
+      .then(async () => {
+        await page.click('[data-op*="close_guide_button"]');
+      })
+      .catch(() => {
+        console.log("No guide popup found");
+      });
+
+    // Handle bet slip popup 
+    await page.waitForSelector('.m-bottom-nav > .m-fast-betslip-wrap > .m-fast-betslip > .close-icon', { timeout: 3000 })
+      .then(async () => {
+        await page.click('.m-bottom-nav > .m-fast-betslip-wrap > .m-fast-betslip > .close-icon');
+      })
+      .catch(() => {
+        console.log("No betslip popup found");
+      });
+
+    // Handle dialog popup
+    await page.waitForSelector('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close', { timeout: 3000 })
+      .then(async () => {
+        await page.click('.es-dialog-body > .es-dialog-main > .m-dialog-wrapper > .m-pop-header > .m-icon-close');
+      })
+      .catch(() => {
+        console.log("No dialog popup found");
+      });
+
+    // Clear popup background if any
+    await page.waitForSelector('.m-betslip-header > .head-container > .wrapper > .wrapper-item > .icon-font-base', { timeout: 3000 })
+      .then(async () => {
+        await page.click('.m-betslip-header > .head-container > .wrapper > .wrapper-item > .icon-font-base');
+      })
+      .catch(() => {
+        console.log("No popup background found");
+      });
+  } catch (error) {
+    console.log("Error handling popups:", error);
   }
 };
 

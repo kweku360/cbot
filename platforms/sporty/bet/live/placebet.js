@@ -7,8 +7,30 @@ var accountResource = require("../../account/accountmanager");
 var logArchitect = require("../../../../managers/log/architect");
 PlaceBet = {}
 
+PlaceBet.clearBetSlip = async (page) => {
+    try {
+        await page.waitForSelector('.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count', { timeout: 3000 });
+        const betCount = await page.$eval('.betslip-tabs > .m-tabs-nav > .m-tabs-tab-active > div > .m-bet-count', el => el.textContent);
+        
+        if (betCount && betCount !== "") {
+            await page.waitForSelector('.m-betslip-header > .head-container > .wrapper > .remove-all', { timeout: 2000 });
+            await page.click('.m-betslip-header > .head-container > .wrapper > .remove-all');
+            
+            await page.waitForSelector('.es-dialog-wrap > .es-dialog > .m-dialog-footer > a.es-dialog-btn:nth-child(2)', { timeout: 2000 });
+            await page.click('.es-dialog-wrap > .es-dialog > .m-dialog-footer > a.es-dialog-btn:nth-child(2)');
+            
+            console.log("Cleared existing bets");
+        }
+    } catch (error) {
+        console.log("Error clearing betslip:", error);
+    }
+};
+
 PlaceBet.live = async (page, betAmt,currentOdd,currentleague,currentgame,outcomechild) => {
     try {
+        // Clear betslip first
+        await PlaceBet.clearBetSlip(page);
+        
         //check account balance (if less than bet amt we abort process)
         let accBal = await accountResource.accountBalance(page)
         await accountResource.BetBalanceVerify(page)
